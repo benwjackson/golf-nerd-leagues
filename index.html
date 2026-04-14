@@ -1,0 +1,1229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Golf Nerd Leagues — 2026 Season</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  /* Brand palette */
+  --deep-rough:#1A3D2B;
+  --fairway:#2E7D52;
+  --the-green:#7EC8A0;
+  --fog:#F7F9F5;
+  --gnerd-gold:#E9C84D;
+  --gold-tint:#FFF3CC;
+  /* Derived */
+  --deep-rough-light:#244a35;
+  --fairway-dark:#236841;
+  --the-green-light:#a8dcc0;
+  --the-green-pale:#d5f0e2;
+  --fog-dark:#e8ede5;
+  /* Semantic */
+  --text:#1a1a1a;--text-muted:#5a6058;--text-light:#8a8f8a;
+  --danger:#c0392b;
+  --wins-bg:var(--gold-tint);--wins-text:#856508;
+  --bucks-bg:var(--gnerd-gold);--bucks-text:#5C3D05;
+  --card-bg:#ffffff;--card-border:#dfe3da;--card-shadow:0 1px 3px rgba(0,0,0,.05),0 4px 12px rgba(0,0,0,.03);
+  --radius:10px;--radius-lg:14px;
+  --nav-h:56px;
+  --major-gradient:linear-gradient(135deg,#E9C84D,#FFF3CC,#E9C84D);
+}
+html{font-family:'IBM Plex Sans',system-ui,sans-serif;background:var(--fog);color:var(--text);-webkit-text-size-adjust:100%;scroll-behavior:smooth}
+body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px);min-height:100dvh}
+
+/* === HEADER === */
+.site-header{background:var(--deep-rough);color:#fff;padding:20px 16px 16px;position:relative;overflow:hidden}
+.site-header::before{content:'';position:absolute;inset:0;background:repeating-linear-gradient(90deg,transparent,transparent 30px,rgba(255,255,255,.015) 30px,rgba(255,255,255,.015) 31px);pointer-events:none}
+.site-header::after{content:'';position:absolute;bottom:0;left:0;right:0;height:3px;background:var(--major-gradient)}
+.header-inner{max-width:600px;margin:0 auto;position:relative}
+.brand{display:flex;align-items:center;gap:10px;margin-bottom:4px}
+.brand-icon{width:40px;height:40px;flex-shrink:0}
+.brand h1{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;letter-spacing:-.3px;line-height:1.2}
+.brand-sub{font-size:12px;color:var(--the-green);letter-spacing:.5px;text-transform:uppercase;margin-left:50px;margin-top:-2px}
+.season-badge{position:absolute;top:0;right:0;background:var(--fairway);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;letter-spacing:.3px;color:#ffffff}
+
+/* === LIVE DATA INDICATOR === */
+.data-status{max-width:600px;margin:0 auto;padding:6px 16px 0;display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text-light)}
+.data-status .dot{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.data-status .dot.live{background:var(--fairway);box-shadow:0 0 4px var(--fairway)}
+.data-status .dot.offline{background:var(--danger)}
+.data-status .dot.loading{background:var(--gnerd-gold);animation:blink 1s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.data-status button{background:none;border:none;color:var(--fairway);font-size:11px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline}
+
+/* === NAV === */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom,0px));background:var(--deep-rough);border-top:1px solid var(--deep-rough-light);display:flex;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--the-green);font-size:10px;font-weight:600;letter-spacing:.3px;text-transform:uppercase;background:none;border:none;cursor:pointer;transition:color .15s;-webkit-tap-highlight-color:transparent;position:relative}
+.nav-btn.active{color:var(--gnerd-gold)}
+.nav-btn.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:var(--gnerd-gold);border-radius:0 0 2px 2px}
+.nav-btn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* === PAGES === */
+.page{display:none;max-width:600px;margin:0 auto;padding:12px 12px 20px}
+.page.active{display:block}
+.page-title{font-family:'DM Serif Display',serif;font-size:20px;margin:12px 4px 12px;color:var(--deep-rough)}
+
+/* === CARDS === */
+.card{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius-lg);box-shadow:var(--card-shadow);overflow:hidden;margin-bottom:12px}
+.card-header{padding:12px 14px 10px;border-bottom:1px solid var(--card-border);display:flex;justify-content:space-between;align-items:center}
+.card-header h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
+.card-header .badge{font-size:12px;font-weight:500;background:var(--the-green-pale);color:var(--fairway);padding:2px 8px;border-radius:20px}
+
+/* === PILL BADGES (Wins + GNerd Bucks) === */
+.pill{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap}
+.pill-wins{background:var(--wins-bg);color:var(--wins-text)}
+.pill-bucks{background:var(--bucks-bg);color:var(--bucks-text)}
+
+/* === LEADERBOARD === */
+.lb-row{display:grid;grid-template-columns:32px 1fr auto;align-items:center;padding:10px 14px;border-bottom:1px solid var(--fog-dark);gap:10px;cursor:pointer;transition:background .15s;-webkit-tap-highlight-color:transparent}
+.lb-row:last-child{border-bottom:none}
+.lb-row:active{background:var(--the-green-pale)}
+.lb-rank{font-size:15px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--fairway);text-align:center}
+.lb-rank.gold{color:var(--bucks-text);font-weight:700}
+.lb-info{min-width:0}
+.lb-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lb-meta{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lb-pts{text-align:right}
+.lb-pts-num{font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough);line-height:1}
+.lb-pts-label{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;text-align:right}
+.lb-movement{display:inline-flex;align-items:center;font-size:11px;font-weight:600;gap:1px}
+.lb-movement.up{color:var(--fairway)}
+.lb-movement.down{color:var(--danger)}
+.lb-movement.same{color:var(--text-light)}
+
+/* Latest Result Banner */
+.latest-result{background:var(--deep-rough-light);color:#fff;border-radius:var(--radius);padding:12px 14px;margin-bottom:12px}
+.latest-result .label{font-size:10px;text-transform:uppercase;letter-spacing:.8px;color:var(--the-green);margin-bottom:4px}
+.latest-result .tourney{font-family:'DM Serif Display',serif;font-size:17px;margin-bottom:2px}
+.latest-result .detail{font-size:12px;color:var(--the-green-light)}
+
+/* Prize Pool */
+.prize-pool{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.lb-season-bonus{font-size:10px;font-weight:600;color:var(--bucks-text);background:var(--gold-tint);padding:1px 6px;border-radius:10px;margin-left:auto;white-space:nowrap}
+.prize-box{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;text-align:center}
+.prize-box .amount{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough)}
+.prize-box .desc{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+
+/* === TOURNAMENT RESULTS === */
+.tourney-card{margin-bottom:10px}
+.tourney-header{padding:12px 14px;display:flex;justify-content:space-between;align-items:flex-start;cursor:pointer;-webkit-tap-highlight-color:transparent}
+.tourney-header:active{background:var(--fog)}
+.tourney-name{font-weight:600;font-size:14px;line-height:1.3}
+.tourney-date{font-size:12px;color:var(--text-muted);margin-top:2px}
+.tourney-prize{flex-shrink:0;margin-left:10px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;padding:3px 8px;border-radius:20px}
+.tourney-prize.cash{background:var(--the-green-pale);color:var(--fairway)}
+.tourney-prize.major{background:var(--gold-tint);color:var(--bucks-text)}
+.tourney-prize.pts-only{background:var(--fog-dark);color:var(--text-muted)}
+.tourney-prize.no-winner{background:#fef0ef;color:var(--danger)}
+.tourney-body{display:none;padding:0 14px 12px}
+.tourney-card.open .tourney-body{display:block}
+.tourney-card.open .tourney-header{border-bottom:1px solid var(--card-border)}
+.scorer-row{display:flex;align-items:center;padding:6px 0;border-bottom:1px solid var(--fog-dark);gap:8px}
+.scorer-row:last-child{border-bottom:none}
+.scorer-pts{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;font-variant-numeric:tabular-nums;flex-shrink:0}
+.scorer-pts.p5{background:var(--fairway);color:#fff}
+.scorer-pts.p4{background:var(--the-green);color:var(--deep-rough)}
+.scorer-pts.p3{background:var(--the-green-light);color:var(--deep-rough)}
+.scorer-pts.p2{background:var(--the-green-pale);color:var(--fairway)}
+.scorer-pts.p1{background:var(--fog-dark);color:var(--text-muted)}
+.scorer-name{font-size:13px;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scorer-team{font-size:11px;color:var(--text-muted);flex-shrink:0}
+.winner-badge{display:inline-flex;align-items:center;gap:4px;background:var(--gold-tint);color:var(--wins-text);font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:8px}
+.upcoming-tag{font-size:11px;color:var(--text-light);font-style:italic}
+
+/* Completed vs upcoming styling */
+.tourney-card.upcoming{opacity:.6}
+.tourney-card.upcoming .tourney-header{cursor:default}
+
+/* === TEAM ROSTERS === */
+.team-select{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;padding:0 2px}
+.team-chip{padding:6px 12px;border-radius:20px;font-size:12px;font-weight:600;border:1.5px solid var(--card-border);background:var(--card-bg);cursor:pointer;transition:all .15s;-webkit-tap-highlight-color:transparent;white-space:nowrap}
+.team-chip.active{background:var(--deep-rough);color:#fff;border-color:var(--deep-rough)}
+.team-chip:active{transform:scale(.96)}
+.roster-panel{display:none}
+.roster-panel.active{display:block}
+.roster-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.roster-stat{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;text-align:center}
+.roster-stat .val{font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough)}
+.roster-stat .label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
+.golfer-row{display:grid;grid-template-columns:28px 1fr auto;align-items:center;padding:10px 14px;border-bottom:1px solid var(--fog-dark);gap:10px}
+.golfer-row:last-child{border-bottom:none}
+.golfer-pick{font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-light);text-align:center}
+.golfer-name{font-size:14px;font-weight:500}
+.golfer-scores{font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.golfer-total{font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough)}
+
+/* === SCHEDULE === */
+.schedule-month{margin-bottom:16px}
+.schedule-month h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--fairway);padding:0 4px 6px;border-bottom:2px solid var(--the-green-light);margin-bottom:4px}
+.sched-row{display:flex;align-items:center;padding:8px 4px;border-bottom:1px solid var(--fog-dark);gap:10px}
+.sched-row:last-child{border-bottom:none}
+.sched-date{font-size:11px;color:var(--text-muted);width:80px;flex-shrink:0}
+.sched-name{font-size:13px;font-weight:500;flex:1;min-width:0}
+.sched-name.major{color:var(--bucks-text);font-weight:700}
+.sched-status{flex-shrink:0;font-size:11px;font-weight:600;padding:2px 8px;border-radius:20px}
+.sched-status.done{background:var(--the-green-pale);color:var(--fairway)}
+.sched-status.next{background:var(--gold-tint);color:var(--bucks-text);animation:pulse 2s ease-in-out infinite}
+.sched-status.future{background:var(--fog-dark);color:var(--text-light)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+/* === TEAM DETAIL MODAL === */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;align-items:flex-end;justify-content:center}
+.modal-overlay.open{display:flex}
+.modal-sheet{background:var(--fog);border-radius:16px 16px 0 0;width:100%;max-width:600px;max-height:85dvh;overflow-y:auto;padding:0 0 env(safe-area-inset-bottom,20px);animation:slideUp .25s ease-out}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.modal-handle{width:36px;height:4px;background:#ccc;border-radius:2px;margin:10px auto 0}
+.modal-header{padding:12px 16px 10px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:var(--fog);z-index:1}
+.modal-header h2{font-family:'DM Serif Display',serif;font-size:20px}
+.modal-close{width:32px;height:32px;border-radius:50%;background:var(--card-border);border:none;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text-muted)}
+.modal-body{padding:0 16px 20px}
+
+/* Utilities */
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+@media(min-width:640px){
+  .page{padding:16px 20px 24px}
+  .site-header{padding:24px 20px 20px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="header-inner">
+    <div class="brand">
+      <div class="brand-icon"><svg viewBox="4 4 112 112" xmlns="http://www.w3.org/2000/svg" fill="none">
+        <circle cx="60" cy="60" r="52" fill="#F7F9F5" stroke="#2E7D52" stroke-width="2"/>
+        <circle cx="42" cy="82" r="3.2" stroke="#C8DDD0" stroke-width="1.1"/>
+        <circle cx="60" cy="90" r="3.2" stroke="#C8DDD0" stroke-width="1.1"/>
+        <circle cx="78" cy="82" r="3.2" stroke="#C8DDD0" stroke-width="1.1"/>
+        <circle cx="32" cy="70" r="3" stroke="#C8DDD0" stroke-width="1"/>
+        <circle cx="88" cy="70" r="3" stroke="#C8DDD0" stroke-width="1"/>
+        <circle cx="18" cy="58" r="2.8" stroke="#C8DDD0" stroke-width="1"/>
+        <circle cx="102" cy="58" r="2.8" stroke="#C8DDD0" stroke-width="1"/>
+        <circle cx="50" cy="97" r="2.6" stroke="#C8DDD0" stroke-width="0.9"/>
+        <circle cx="70" cy="97" r="2.6" stroke="#C8DDD0" stroke-width="0.9"/>
+        <circle cx="36" cy="94" r="2.2" stroke="#C8DDD0" stroke-width="0.9"/>
+        <circle cx="84" cy="94" r="2.2" stroke="#C8DDD0" stroke-width="0.9"/>
+        <line x1="10" y1="63" x2="110" y2="63" stroke="#2E7D52" stroke-width="1.8"/>
+        <path d="M60 14 C42 14 26 22 18 34 C13 42 14 56 18 62 L60 62 Z" fill="#2E7D52"/>
+        <path d="M60 14 C78 14 94 22 102 34 C107 42 106 56 102 62 L60 62 Z" fill="#2E7D52"/>
+        <line x1="60" y1="15" x2="60" y2="62" stroke="#1A3D2B" stroke-width="1.6"/>
+        <!-- Brain folds left - more defined with longer, curvier sulci -->
+        <path d="M36 19 C42 16 46 20 44 26 C42 30 37 28 36 24" stroke="#7EC8A0" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M24 28 C30 24 36 26 38 32 C39 36 34 38 28 35" stroke="#7EC8A0" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M19 40 C25 36 32 38 33 44 C34 48 28 50 22 47" stroke="#7EC8A0" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M17 52 C24 49 30 51 30 56 C30 59 24 60 19 58" stroke="#7EC8A0" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M40 34 C46 32 50 36 48 41 C46 44 42 43 40 40" stroke="#7EC8A0" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M34 48 C40 46 44 49 43 54 C42 57 37 57 34 54" stroke="#7EC8A0" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Brain folds right - mirror -->
+        <path d="M84 19 C78 16 74 20 76 26 C78 30 83 28 84 24" stroke="#7EC8A0" stroke-width="1.8" stroke-linecap="round"/>
+        <path d="M96 28 C90 24 84 26 82 32 C81 36 86 38 92 35" stroke="#7EC8A0" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M101 40 C95 36 88 38 87 44 C86 48 92 50 98 47" stroke="#7EC8A0" stroke-width="1.7" stroke-linecap="round"/>
+        <path d="M103 52 C96 49 90 51 90 56 C90 59 96 60 101 58" stroke="#7EC8A0" stroke-width="1.6" stroke-linecap="round"/>
+        <path d="M80 34 C74 32 70 36 72 41 C74 44 78 43 80 40" stroke="#7EC8A0" stroke-width="1.5" stroke-linecap="round"/>
+        <path d="M86 48 C80 46 76 49 77 54 C78 57 83 57 86 54" stroke="#7EC8A0" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Eyes -->
+        <circle cx="46" cy="77" r="4.5" fill="#1A3D2B"/>
+        <circle cx="74" cy="77" r="4.5" fill="#1A3D2B"/>
+        <circle cx="48" cy="75.2" r="1.4" fill="white"/>
+        <circle cx="76" cy="75.2" r="1.4" fill="white"/>
+        <!-- Nerdy smirk - subtle, slightly asymmetric -->
+        <path d="M46 90 Q56 96 68 90" stroke="#1A3D2B" stroke-width="2.2" stroke-linecap="round"/>
+        <path d="M68 90 Q70 89 72 88" stroke="#1A3D2B" stroke-width="2" stroke-linecap="round"/>
+        <!-- Cheek blush -->
+        <circle cx="33" cy="84" r="5" fill="#E9C84D" opacity="0.28"/>
+        <circle cx="87" cy="84" r="5" fill="#E9C84D" opacity="0.28"/>
+      </svg></div>
+      <h1>Golf Nerd Leagues</h1>
+    </div>
+    <div class="brand-sub">For people who actually watch golf</div>
+    <div class="season-badge">2026 SEASON</div>
+  </div>
+</header>
+
+<!-- DATA STATUS BAR -->
+<div class="data-status" id="data-status">
+  <span class="dot loading" id="status-dot"></span>
+  <span id="status-text">Loading live data...</span>
+</div>
+
+<!-- PAGES -->
+<main>
+
+<!-- LEADERBOARD PAGE -->
+<div class="page active" id="page-leaderboard">
+  <div class="latest-result" id="latest-banner"></div>
+  <div class="page-title">Season Standings</div>
+  <div class="prize-pool" id="prize-pool">
+    <div class="prize-box"><div class="amount" id="pp-total">1,800</div><div class="desc">Total GNerd Bucks</div></div>
+    <div class="prize-box"><div class="amount" id="pp-events">—/37</div><div class="desc">Events Done</div></div>
+  </div>
+  <div class="card">
+    <div class="card-header"><h3>Standings</h3><span class="badge" id="team-count-badge">9 Teams</span></div>
+    <div id="leaderboard-list"></div>
+  </div>
+</div>
+
+<!-- RESULTS PAGE -->
+<div class="page" id="page-results">
+  <div class="page-title">Tournament Results</div>
+  <div id="results-list"></div>
+</div>
+
+<!-- ROSTERS PAGE -->
+<div class="page" id="page-rosters">
+  <div class="page-title">Team Rosters</div>
+  <div class="team-select" id="team-chips"></div>
+  <div id="roster-panels"></div>
+</div>
+
+<!-- SCHEDULE PAGE -->
+<div class="page" id="page-schedule">
+  <div class="page-title">2026 Schedule</div>
+  <div id="schedule-list"></div>
+</div>
+
+</main>
+
+<!-- TEAM DETAIL MODAL -->
+<div class="modal-overlay" id="team-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-header">
+      <h2 id="modal-team-name"></h2>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body" id="modal-body"></div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" data-page="leaderboard" onclick="switchPage('leaderboard')">
+    <svg viewBox="0 0 24 24"><path d="M12 2L15 8.5L22 9.3L17 14L18.2 21L12 17.8L5.8 21L7 14L2 9.3L9 8.5Z"/></svg>
+    Standings
+  </button>
+  <button class="nav-btn" data-page="results" onclick="switchPage('results')">
+    <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+    Results
+  </button>
+  <button class="nav-btn" data-page="rosters" onclick="switchPage('rosters')">
+    <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+    Rosters
+  </button>
+  <button class="nav-btn" data-page="schedule" onclick="switchPage('schedule')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
+    Schedule
+  </button>
+</nav>
+
+<script>
+// =============================================
+// CONFIGURATION
+// =============================================
+const CONFIG = {
+  BASE_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPAhkOe120qXwoVIXrbmYSVEWCAr3ZqvlOSCdZkoq5XGVoFOS8uXFxnOEEhl5sH3FITSE0bmjSIzyG',
+  CACHE_KEY: 'gnl_cache',
+  CACHE_TTL: 5 * 60 * 1000, // 5 min
+};
+
+// Draft order maps team number (pick position) to team name
+const DRAFT_ORDER = {1:'Sheehy',2:'Robinson',3:'Bingle',4:'Jackson',5:'Lynch',6:'Smith Daniels',7:'Cooney',8:'Bresnahan',9:'Descloux'};
+
+const OWNER_MAP = {
+  'Jackson':'Ben Jackson','Cooney':'Michael Cooney','Descloux':'Jon-Paul Descloux',
+  'Bingle':'Bingle','Sheehy':'Vince Sheehy','Robinson':'Ryan Robinson',
+  'Smith Daniels':'Matt Smith Daniels','Lynch':'Jimmy Lynch','Bresnahan':'Mike Bresnahan'
+};
+
+const MAJOR_NAMES = ['masters','u.s. open','pga championship','the open championship'];
+
+// =============================================
+// ACTIVE DATA (replaced by live fetch or fallback)
+// =============================================
+let LEADERBOARD = [];
+let TEAMS = {};
+let TOURNAMENTS = [];
+
+// =============================================
+// GOOGLE SHEETS FETCH + PARSE
+// =============================================
+
+/** Convert an HTML <table> into a 2D string array, expanding colspan/rowspan */
+function tableToArray(table) {
+  const grid = [];
+  const rows = table.querySelectorAll('tr');
+
+  rows.forEach((tr, ri) => {
+    if (!grid[ri]) grid[ri] = [];
+    const cells = tr.querySelectorAll('td, th');
+
+    cells.forEach(cell => {
+      // Find next open column in this row
+      let ci = 0;
+      while (grid[ri][ci] !== undefined) ci++;
+
+      const text = (cell.textContent || '').trim();
+      const colspan = parseInt(cell.getAttribute('colspan')) || 1;
+      const rowspan = parseInt(cell.getAttribute('rowspan')) || 1;
+
+      for (let r = 0; r < rowspan; r++) {
+        for (let c = 0; c < colspan; c++) {
+          if (!grid[ri + r]) grid[ri + r] = [];
+          grid[ri + r][ci + c] = (r === 0 && c === 0) ? text : '';
+        }
+      }
+    });
+  });
+
+  return grid;
+}
+
+/** Identify which table belongs to which sheet by scanning content */
+function identifySheets(tables) {
+  const sheets = { leaderboard: null, scoreboard: null, draft: null };
+
+  for (const table of tables) {
+    const arr = tableToArray(table);
+    if (!arr || arr.length < 3) continue;
+
+    // Flatten first 3 rows to text for pattern matching
+    const top = arr.slice(0, 6).map(r => (r || []).join(' ').toLowerCase()).join(' ');
+
+    if (top.includes('last week') && top.includes('rank') && top.includes('team') && top.includes('points') && !sheets.leaderboard) {
+      sheets.leaderboard = arr;
+    } else if (top.includes('date') && top.includes('tournament') && top.includes('location') && !sheets.scoreboard) {
+      // Prefer the one with "2026" content or the largest table
+      if (!sheets.scoreboard || arr.length > sheets.scoreboard.length) {
+        sheets.scoreboard = arr;
+      }
+    } else if (top.includes('pick') && top.includes('round 1') && top.includes('round 2') && !sheets.draft) {
+      sheets.draft = arr;
+    }
+  }
+
+  return sheets;
+}
+
+/** Parse leaderboard 2D array into LEADERBOARD data */
+function parseLeaderboard(arr) {
+  // Find header row
+  let hdr = -1;
+  for (let i = 0; i < Math.min(5, arr.length); i++) {
+    const row = (arr[i] || []).map(c => (c || '').toLowerCase());
+    if (row.includes('rank') && row.includes('team')) { hdr = i; break; }
+  }
+  if (hdr === -1) return null;
+
+  const headers = arr[hdr].map(c => (c || '').toLowerCase().trim());
+  const col = {
+    lastWeek: headers.indexOf('last week'),
+    rank:     headers.indexOf('rank'),
+    team:     headers.indexOf('team'),
+    points:   headers.indexOf('points'),
+    wins:     headers.indexOf('wins'),
+    cash:     headers.findIndex(h => h.includes('weekly')),
+    topPayout:headers.findIndex(h => h.includes('top team') || h.includes('top payout')),
+    total:    headers.indexOf('total'),
+  };
+
+  const teams = [];
+  for (let i = hdr + 1; i < arr.length; i++) {
+    const r = arr[i];
+    if (!r) break;
+    const team = (r[col.team] || '').trim();
+    if (!team) break;
+    teams.push({
+      rank:     parseInt(r[col.rank]) || teams.length + 1,
+      lastWeek: parseInt(r[col.lastWeek]) || 0,
+      team,
+      owner:    OWNER_MAP[team] || team,
+      points:   parseInt(r[col.points]) || 0,
+      wins:     parseInt(r[col.wins]) || 0,
+      cash:     parseInt(r[col.cash]) || 0,
+      topPayout:parseInt(r[col.topPayout]) || 0,
+      total:    parseInt(r[col.total]) || 0,
+    });
+  }
+  return teams.length ? teams : null;
+}
+
+/** Parse draft 2D array to get team# -> team name mapping */
+function parseDraft(arr) {
+  const map = {};
+  for (let i = 0; i < arr.length; i++) {
+    const r = arr[i];
+    if (!r) continue;
+    const pick = (r[0] || '').trim();
+    const team = (r[1] || '').trim();
+    const m = pick.match(/^#(\d+)$/);
+    if (m && team) map[parseInt(m[1])] = team;
+  }
+  return Object.keys(map).length ? map : DRAFT_ORDER;
+}
+
+/** Parse scoreboard 2D array into TOURNAMENTS + TEAMS data */
+function parseScoreboard(arr, draftMap, leaderboard) {
+  // --- Locate header rows ---
+  // Row with "Date" in col A → dateRow (has tournament dates)
+  // Next row with "Tournament" → nameRow
+  // Next row with "Location" → locRow
+  // Row with "Prize" → prizeRow
+  let dateRow = -1, nameRow = -1, locRow = -1, prizeRow = -1;
+
+  for (let i = 0; i < Math.min(10, arr.length); i++) {
+    const a = (arr[i]?.[0] || '').toLowerCase().trim();
+    if (a === 'date') dateRow = i;
+    if (a === 'tournament') nameRow = i;
+    if (a === 'location') locRow = i;
+    if (a === 'prize') prizeRow = i;
+  }
+  if (nameRow === -1) return null;
+  if (dateRow === -1) dateRow = nameRow - 1;
+  if (locRow === -1) locRow = nameRow + 1;
+  if (prizeRow === -1) prizeRow = locRow + 2;
+
+  // --- Find tournament columns (look for non-empty in nameRow, starting from col 5+) ---
+  const tourneyInfos = [];
+  for (let c = 3; c < (arr[nameRow] || []).length; c++) {
+    const name = (arr[nameRow][c] || '').trim();
+    if (!name) continue;
+    if (name.toLowerCase() === 'tournament') continue;
+    tourneyInfos.push({
+      col: c,
+      name,
+      date: (arr[dateRow]?.[c] || '').trim(),
+      location: (arr[locRow]?.[c] || '').trim(),
+      prize: (arr[prizeRow]?.[c] || '').trim(),
+    });
+  }
+
+  // --- Find team blocks: scan column A for "#N" pattern ---
+  const teamBlocks = [];
+  for (let r = 0; r < arr.length; r++) {
+    const cell = (arr[r]?.[0] || '').trim();
+    const m = cell.match(/^#(\d+)$/);
+    if (m) teamBlocks.push({ row: r, num: parseInt(m[1]) });
+  }
+
+  // --- Figure out column indices for Pick, Golfer, Total ---
+  // Look for a header row with "Pick #" / "GOLFER" / "TOTAL" just before first team block
+  let pickCol = 2, golferCol = 3, totalCol = 4; // defaults matching known structure
+  for (let r = Math.max(0, (teamBlocks[0]?.row || 6) - 3); r < (teamBlocks[0]?.row || 6); r++) {
+    const row = (arr[r] || []).map(c => (c || '').toLowerCase().trim());
+    const gi = row.findIndex(c => c === 'golfer');
+    if (gi !== -1) {
+      golferCol = gi;
+      const pi = row.findIndex(c => c.includes('pick'));
+      if (pi !== -1) pickCol = pi;
+      const ti = row.findIndex(c => c === 'total');
+      if (ti !== -1) totalCol = ti;
+      break;
+    }
+  }
+
+  // --- Extract golfer data per team ---
+  const teamData = {};
+  for (let tb = 0; tb < teamBlocks.length; tb++) {
+    const startRow = teamBlocks[tb].row;
+    const teamNum = teamBlocks[tb].num;
+    const teamName = draftMap[teamNum] || `Team ${teamNum}`;
+    const golfers = [];
+
+    for (let offset = 0; offset < 10; offset++) {
+      const r = startRow + offset;
+      if (r >= arr.length) break;
+      const row = arr[r] || [];
+
+      const name = (row[golferCol] || '').trim().replace(/\*$/, '');
+      if (!name) continue;
+
+      const pick = parseInt(row[pickCol]) || (offset + 1);
+      const total = parseInt(row[totalCol]) || 0;
+
+      const scores = {};
+      for (const t of tourneyInfos) {
+        const val = parseInt(row[t.col]);
+        if (val > 0) scores[t.name] = val;
+      }
+
+      golfers.push({ name, pick, total, scores });
+    }
+
+    const lb = leaderboard?.find(t => t.team === teamName);
+    teamData[teamName] = {
+      golfers,
+      wins: lb?.wins || 0,
+      cash: lb?.cash || 0,
+      totalPoints: lb?.points || golfers.reduce((s, g) => s + g.total, 0),
+    };
+  }
+
+  // --- Build tournament results ---
+  const tournaments = tourneyInfos.map(t => {
+    const scorers = [];
+    for (const [teamName, td] of Object.entries(teamData)) {
+      for (const g of td.golfers) {
+        if (g.scores[t.name]) {
+          scorers.push({ g: g.name, t: teamName, p: g.scores[t.name] });
+        }
+      }
+    }
+    scorers.sort((a, b) => b.p - a.p);
+
+    const completed = scorers.length > 0;
+    let prize = /^\d+$/.test(t.prize) ? parseInt(t.prize) : t.prize;
+
+    // Determine weekly winner
+    let winner = null;
+    if (completed && typeof prize === 'number') {
+      const totals = {};
+      scorers.forEach(s => { totals[s.t] = (totals[s.t] || 0) + s.p; });
+      const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
+      if (sorted.length > 0 && (sorted.length === 1 || sorted[0][1] > sorted[1][1])) {
+        winner = sorted[0][0];
+      }
+    }
+
+    const major = MAJOR_NAMES.some(m => t.name.toLowerCase().includes(m));
+
+    return { name: t.name, date: t.date, location: t.location, prize, completed, scorers, winner, major };
+  });
+
+  return { tournaments, teamData };
+}
+
+// ---- CSV Parser ----
+function parseCSV(text) {
+  const rows = [];
+  let cur = '', inQ = false, row = [];
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i];
+    if (inQ) {
+      if (ch === '"') { if (text[i+1] === '"') { cur += '"'; i++; } else inQ = false; }
+      else cur += ch;
+    } else {
+      if (ch === '"') inQ = true;
+      else if (ch === ',') { row.push(cur); cur = ''; }
+      else if (ch === '\n' || (ch === '\r' && text[i+1] === '\n')) {
+        row.push(cur); cur = ''; rows.push(row); row = [];
+        if (ch === '\r') i++;
+      } else if (ch === '\r') { row.push(cur); cur = ''; rows.push(row); row = []; }
+      else cur += ch;
+    }
+  }
+  if (cur || row.length) { row.push(cur); rows.push(row); }
+  return rows;
+}
+
+// ---- GID Discovery: fetch pubhtml page, extract sheet name->gid mapping ----
+async function discoverGIDs() {
+  const resp = await fetch(CONFIG.BASE_URL + '/pubhtml');
+  if (!resp.ok) throw new Error('pubhtml ' + resp.status);
+  const html = await resp.text();
+  const doc = new DOMParser().parseFromString(html, 'text/html');
+  const map = {};
+  // Sheet menu: <li id="sheet-button-GID"><a>Sheet Name</a></li>
+  doc.querySelectorAll('[id^="sheet-button-"]').forEach(li => {
+    const gid = li.id.replace('sheet-button-', '');
+    const name = (li.textContent || '').trim();
+    if (gid && name) map[name] = gid;
+  });
+  return map;
+}
+
+// ---- Fetch a single sheet as CSV by GID ----
+async function fetchSheetCSV(gid) {
+  const url = CONFIG.BASE_URL + '/pub?gid=' + gid + '&single=true&output=csv';
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error('CSV gid=' + gid + ' HTTP ' + resp.status);
+  return parseCSV(await resp.text());
+}
+
+/** Main fetch: tries CSV-per-sheet (best CORS support), falls back to pubhtml HTML parsing */
+async function fetchLiveData() {
+  // Check cache
+  try {
+    const cached = localStorage.getItem(CONFIG.CACHE_KEY);
+    if (cached) {
+      const { data, ts } = JSON.parse(cached);
+      if (Date.now() - ts < CONFIG.CACHE_TTL) return data;
+    }
+  } catch (e) {}
+
+  let sheets = { leaderboard: null, scoreboard: null, draft: null };
+
+  // ── Strategy 1: Discover GIDs via pubhtml, then fetch individual CSVs ──
+  try {
+    const gidMap = await discoverGIDs();
+    console.log('Discovered GIDs:', gidMap);
+
+    const lbGid  = gidMap['2026 Leaderboard'];
+    const sbGid  = gidMap['2026 Season Scoreboard'];
+    const drGid  = gidMap['2026 DRAFT'];
+
+    if (lbGid && sbGid) {
+      const fetches = [fetchSheetCSV(lbGid), fetchSheetCSV(sbGid)];
+      if (drGid) fetches.push(fetchSheetCSV(drGid));
+      const results = await Promise.all(fetches);
+      sheets.leaderboard = results[0];
+      sheets.scoreboard  = results[1];
+      if (results[2]) sheets.draft = results[2];
+      console.log('CSV fetch succeeded via GID discovery');
+    } else {
+      throw new Error('GIDs not found for required sheets');
+    }
+  } catch (e1) {
+    console.warn('Strategy 1 (GID discovery + CSV) failed:', e1.message);
+
+    // ── Strategy 2: Fetch default CSV (gid=0) + try pubhtml table parsing ──
+    try {
+      // gid=0 is typically the first sheet (Leaderboard)
+      const lbCSV = await fetchSheetCSV('0');
+      sheets.leaderboard = lbCSV;
+      console.log('Fetched leaderboard via gid=0');
+
+      // For scoreboard, try pubhtml table parsing as fallback
+      const resp = await fetch(CONFIG.BASE_URL + '/pubhtml');
+      const html = await resp.text();
+      const doc = new DOMParser().parseFromString(html, 'text/html');
+      const tables = Array.from(doc.querySelectorAll('table'));
+      for (const table of tables) {
+        const arr = tableToArray(table);
+        if (!arr || arr.length < 10) continue;
+        const top = arr.slice(0, 6).map(r => (r || []).join(' ').toLowerCase()).join(' ');
+        if (top.includes('date') && top.includes('tournament') && top.includes('location')) {
+          sheets.scoreboard = arr;
+        }
+        if (top.includes('pick') && top.includes('round 1')) {
+          sheets.draft = arr;
+        }
+      }
+    } catch (e2) {
+      console.warn('Strategy 2 (gid=0 + pubhtml) failed:', e2.message);
+
+      // ── Strategy 3: Pure pubhtml table parsing ──
+      try {
+        const resp = await fetch(CONFIG.BASE_URL + '/pubhtml');
+        const html = await resp.text();
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const tables = Array.from(doc.querySelectorAll('table'));
+        const identified = identifySheets(tables);
+        sheets = identified;
+      } catch (e3) {
+        throw new Error('All fetch strategies failed. If opening from a file, deploy to GitHub Pages for live data.');
+      }
+    }
+  }
+
+  if (!sheets.leaderboard) throw new Error('Leaderboard sheet not found');
+  if (!sheets.scoreboard) throw new Error('Scoreboard sheet not found');
+
+  // Parse the 2D arrays into app data
+  const draftMap = sheets.draft ? parseDraft(sheets.draft) : DRAFT_ORDER;
+  const leaderboard = parseLeaderboard(sheets.leaderboard);
+  if (!leaderboard) throw new Error('Could not parse leaderboard');
+
+  const sbResult = parseScoreboard(sheets.scoreboard, draftMap, leaderboard);
+  if (!sbResult) throw new Error('Could not parse scoreboard');
+
+  const result = {
+    leaderboard,
+    teams: sbResult.teamData,
+    tournaments: sbResult.tournaments,
+  };
+
+  // Cache
+  try {
+    localStorage.setItem(CONFIG.CACHE_KEY, JSON.stringify({ data: result, ts: Date.now() }));
+  } catch (e) {}
+
+  return result;
+}
+
+
+// =============================================
+// HARDCODED FALLBACK DATA (current as of last manual update)
+// =============================================
+
+const FALLBACK_LEADERBOARD = [
+  {rank:1,lastWeek:2,team:"Cooney",owner:"Michael Cooney",points:37,wins:1,cash:25,topPayout:500,total:525},
+  {rank:2,lastWeek:1,team:"Sheehy",owner:"Vince Sheehy",points:35,wins:1,cash:25,topPayout:300,total:325},
+  {rank:3,lastWeek:3,team:"Descloux",owner:"Jon-Paul Descloux",points:33,wins:3,cash:75,topPayout:100,total:175},
+  {rank:4,lastWeek:4,team:"Bresnahan",owner:"Mike Bresnahan",points:27,wins:3,cash:75,topPayout:0,total:75},
+  {rank:5,lastWeek:6,team:"Bingle",owner:"Bingle",points:21,wins:0,cash:0,topPayout:0,total:0},
+  {rank:6,lastWeek:5,team:"Robinson",owner:"Ryan Robinson",points:20,wins:0,cash:0,topPayout:0,total:0},
+  {rank:7,lastWeek:7,team:"Smith Daniels",owner:"Matt Smith Daniels",points:18,wins:1,cash:25,topPayout:0,total:25},
+  {rank:8,lastWeek:8,team:"Lynch",owner:"Jimmy Lynch",points:18,wins:1,cash:25,topPayout:0,total:25},
+  {rank:9,lastWeek:9,team:"Jackson",owner:"Ben Jackson",points:13,wins:0,cash:0,topPayout:0,total:0},
+];
+
+const FALLBACK_TEAMS = {
+  "Sheehy":{golfers:[
+    {name:"Scottie Scheffler",pick:1,total:11,scores:{"The American Express":5,"Waste Management Phoenix Open":3,"AT&T Pebble Beach Pro-Am":3}},
+    {name:"Robert Macintyre",pick:2,total:4,scores:{"Sony Open in Hawaii":2,"The Players Championship":2}},
+    {name:"Sepp Straka",pick:3,total:4,scores:{"AT&T Pebble Beach Pro-Am":4}},
+    {name:"Sungjae Im",pick:4,total:2,scores:{"Valspar Championship":2}},
+    {name:"Si Woo Kim",pick:5,total:10,scores:{"The American Express":3,"Farmer's Insurance Open":4,"Waste Management Phoenix Open":3}},
+    {name:"Chris Kirk",pick:6,total:0,scores:{}},
+    {name:"Pierceson Coody",pick:7,total:4,scores:{"Farmer's Insurance Open":4}},
+    {name:"Ryan Fox",pick:8,total:0,scores:{}},
+    {name:"Kevin Yu",pick:9,total:0,scores:{}},
+    {name:"Rico Hoey",pick:10,total:0,scores:{}}
+  ],wins:1,cash:25,totalPoints:35},
+  "Robinson":{golfers:[
+    {name:"Rory McIlroy",pick:1,total:4,scores:{"Genesis Invitational":4}},
+    {name:"Hideki Matsuyama",pick:2,total:5,scores:{"Waste Management Phoenix Open":4,"AT&T Pebble Beach Pro-Am":1}},
+    {name:"JJ Spaun",pick:3,total:0,scores:{}},
+    {name:"Aaron Rai",pick:4,total:0,scores:{}},
+    {name:"Rasmus Hojgaard",pick:5,total:1,scores:{"Cognizant Classic in the Palm Beaches":1}},
+    {name:"Billy Horschel",pick:6,total:0,scores:{}},
+    {name:"Jake Knapp",pick:7,total:8,scores:{"Farmer's Insurance Open":3,"Waste Management Phoenix Open":2,"AT&T Pebble Beach Pro-Am":1,"Genesis Invitational":1,"Texas Children's Houston Open":1}},
+    {name:"JT Poston",pick:8,total:0,scores:{}},
+    {name:"Tom Hoge",pick:9,total:2,scores:{"The American Express":2}},
+    {name:"Lucas Glover",pick:10,total:0,scores:{}}
+  ],wins:0,cash:0,totalPoints:20},
+  "Bingle":{golfers:[
+    {name:"Tommy Fleetwood",pick:1,total:3,scores:{"AT&T Pebble Beach Pro-Am":3}},
+    {name:"Marco Penge",pick:2,total:2,scores:{"Valspar Championship":2}},
+    {name:"Sam Stevens",pick:3,total:5,scores:{"The American Express":3,"Texas Children's Houston Open":2}},
+    {name:"Kristoffer Reitan",pick:4,total:0,scores:{}},
+    {name:"Taylor Pendrith",pick:5,total:1,scores:{"Sony Open in Hawaii":1}},
+    {name:"Ryan Gerard",pick:6,total:8,scores:{"Sony Open in Hawaii":4,"The American Express":4}},
+    {name:"Jayden Schaper",pick:7,total:0,scores:{}},
+    {name:"Thriston Lawrence",pick:8,total:0,scores:{}},
+    {name:"Andrew Novak",pick:9,total:2,scores:{"Farmer's Insurance Open":2}},
+    {name:"Max McGreevy",pick:10,total:0,scores:{}}
+  ],wins:0,cash:0,totalPoints:21},
+  "Jackson":{golfers:[
+    {name:"Xander Schauffele",pick:1,total:5,scores:{"The Players Championship":3,"Valspar Championship":2}},
+    {name:"Ben Griffin",pick:2,total:0,scores:{}},
+    {name:"Justin Thomas",pick:3,total:0,scores:{}},
+    {name:"Jordan Spieth",pick:4,total:0,scores:{}},
+    {name:"Daniel Berger",pick:5,total:5,scores:{"Sony Open in Hawaii":1,"Arnold Palmer Invitational presented by Mastercard":4}},
+    {name:"Jon Rahm",pick:6,total:0,scores:{}},
+    {name:"Michael Thorbjornsen",pick:7,total:3,scores:{"Waste Management Phoenix Open":3}},
+    {name:"Michael Brennan",pick:8,total:0,scores:{}},
+    {name:"Garrick Higgo",pick:9,total:0,scores:{}},
+    {name:"Neal Shipley",pick:10,total:0,scores:{}}
+  ],wins:0,cash:0,totalPoints:13},
+  "Lynch":{golfers:[
+    {name:"Ludvig Aberg",pick:1,total:4,scores:{"Arnold Palmer Invitational presented by Mastercard":3,"The Players Championship":1}},
+    {name:"Cam Young",pick:2,total:8,scores:{"Arnold Palmer Invitational presented by Mastercard":3,"The Players Championship":5}},
+    {name:"Alex Noren",pick:3,total:0,scores:{}},
+    {name:"Brian Harman",pick:4,total:0,scores:{}},
+    {name:"Denny McCarthy",pick:5,total:0,scores:{}},
+    {name:"Will Zalatoris",pick:6,total:0,scores:{}},
+    {name:"Harry Hall",pick:7,total:1,scores:{"Sony Open in Hawaii":1}},
+    {name:"Kurt Kitayama",pick:8,total:0,scores:{}},
+    {name:"Stephan Jaeger",pick:9,total:4,scores:{"Farmer's Insurance Open":3,"Valspar Championship":1}},
+    {name:"Luke Clanton",pick:10,total:1,scores:{"Puerto Rico Open":1}}
+  ],wins:1,cash:25,totalPoints:18},
+  "Smith Daniels":{golfers:[
+    {name:"Collin Morikawa",pick:1,total:7,scores:{"AT&T Pebble Beach Pro-Am":5,"Arnold Palmer Invitational presented by Mastercard":2}},
+    {name:"Max Homa",pick:2,total:0,scores:{}},
+    {name:"Tom Kim",pick:3,total:0,scores:{}},
+    {name:"Shane Lowry",pick:4,total:5,scores:{"AT&T Pebble Beach Pro-Am":1,"Cognizant Classic in the Palm Beaches":4}},
+    {name:"Bryson DeChambeau",pick:5,total:0,scores:{}},
+    {name:"Tony Finau",pick:6,total:0,scores:{}},
+    {name:"Brooks Koepka",pick:7,total:1,scores:{"Cognizant Classic in the Palm Beaches":1}},
+    {name:"Adam Scott",pick:8,total:3,scores:{"Genesis Invitational":3}},
+    {name:"Davis Thompson",pick:9,total:2,scores:{"Puerto Rico Open":2}},
+    {name:"Austin Eckroat",pick:10,total:0,scores:{}}
+  ],wins:1,cash:25,totalPoints:18},
+  "Cooney":{golfers:[
+    {name:"Russell Henley",pick:1,total:3,scores:{"The American Express":2,"Arnold Palmer Invitational presented by Mastercard":1}},
+    {name:"Sam Burns",pick:2,total:2,scores:{"AT&T Pebble Beach Pro-Am":2}},
+    {name:"Maverick McNealy",pick:3,total:1,scores:{"Farmer's Insurance Open":1}},
+    {name:"Wyndham Clark",pick:4,total:1,scores:{"The American Express":1}},
+    {name:"Min Woo Lee",pick:5,total:8,scores:{"AT&T Pebble Beach Pro-Am":4,"Arnold Palmer Invitational presented by Mastercard":1,"Texas Children's Houston Open":3}},
+    {name:"Harris English",pick:6,total:0,scores:{}},
+    {name:"Nicolai Hojgaard",pick:7,total:9,scores:{"Waste Management Phoenix Open":3,"Cognizant Classic in the Palm Beaches":2,"Texas Children's Houston Open":4}},
+    {name:"Nico Echavarria",pick:8,total:6,scores:{"AT&T Pebble Beach Pro-Am":1,"Cognizant Classic in the Palm Beaches":5}},
+    {name:"Johnny Keefer",pick:9,total:0,scores:{}},
+    {name:"Matt McCarty",pick:10,total:7,scores:{"The American Express":4,"Texas Children's Houston Open":3}}
+  ],wins:1,cash:25,totalPoints:37},
+  "Bresnahan":{golfers:[
+    {name:"Patrick Cantlay",pick:1,total:2,scores:{"The American Express":1,"Valspar Championship":1}},
+    {name:"Corey Conners",pick:2,total:0,scores:{}},
+    {name:"Keegan Bradley",pick:3,total:0,scores:{}},
+    {name:"Akshay Bhatia",pick:4,total:10,scores:{"Waste Management Phoenix Open":3,"AT&T Pebble Beach Pro-Am":2,"Arnold Palmer Invitational presented by Mastercard":5}},
+    {name:"Nick Taylor",pick:5,total:0,scores:{}},
+    {name:"Jacob Bridgeman",pick:6,total:10,scores:{"Sony Open in Hawaii":2,"The American Express":1,"AT&T Pebble Beach Pro-Am":1,"Genesis Invitational":5,"The Players Championship":1}},
+    {name:"Michael Kim",pick:7,total:0,scores:{}},
+    {name:"Rickie Fowler",pick:8,total:0,scores:{}},
+    {name:"Justin Rose",pick:9,total:5,scores:{"Farmer's Insurance Open":5}},
+    {name:"Brian Campbell",pick:10,total:0,scores:{}}
+  ],wins:3,cash:75,totalPoints:27},
+  "Descloux":{golfers:[
+    {name:"Matt Fitzpatrick",pick:1,total:10,scores:{"Waste Management Phoenix Open":1,"The Players Championship":4,"Valspar Championship":5}},
+    {name:"Viktor Hovland",pick:2,total:0,scores:{}},
+    {name:"Sami Valimaki",pick:3,total:0,scores:{}},
+    {name:"Chris Gotterup",pick:4,total:11,scores:{"Sony Open in Hawaii":5,"Waste Management Phoenix Open":5,"Texas Children's Houston Open":1}},
+    {name:"Sahith Theegala",pick:5,total:5,scores:{"The American Express":2,"Farmer's Insurance Open":2,"Arnold Palmer Invitational presented by Mastercard":1}},
+    {name:"Max Greyserman",pick:6,total:0,scores:{}},
+    {name:"Jason Day",pick:7,total:5,scores:{"The American Express":4,"Texas Children's Houston Open":1}},
+    {name:"Aldrich Potgieter",pick:8,total:2,scores:{"Genesis Invitational":2}},
+    {name:"Mackenzie Hughes",pick:9,total:0,scores:{}},
+    {name:"Rasmus Neergaard-Petersen",pick:10,total:0,scores:{}}
+  ],wins:3,cash:75,totalPoints:33}
+};
+
+const FALLBACK_TOURNAMENTS = [
+  {name:"Sony Open in Hawaii",date:"JAN 15-18",location:"Waialae CC, Honolulu, HI",prize:25,completed:true,
+   scorers:[{g:"Chris Gotterup",t:"Descloux",p:5},{g:"Ryan Gerard",t:"Bingle",p:4},{g:"Robert Macintyre",t:"Sheehy",p:2},{g:"Jacob Bridgeman",t:"Bresnahan",p:2},{g:"Taylor Pendrith",t:"Bingle",p:1},{g:"Daniel Berger",t:"Jackson",p:1},{g:"Harry Hall",t:"Lynch",p:1}],winner:"Descloux"},
+  {name:"The American Express",date:"JAN 22-25",location:"Stadium Course, La Quinta, CA",prize:25,completed:true,
+   scorers:[{g:"Scottie Scheffler",t:"Sheehy",p:5},{g:"Ryan Gerard",t:"Bingle",p:4},{g:"Matt McCarty",t:"Cooney",p:4},{g:"Jason Day",t:"Descloux",p:4},{g:"Si Woo Kim",t:"Sheehy",p:3},{g:"Sam Stevens",t:"Bingle",p:3},{g:"Tom Hoge",t:"Robinson",p:2},{g:"Russell Henley",t:"Cooney",p:2},{g:"Sahith Theegala",t:"Descloux",p:2},{g:"Wyndham Clark",t:"Cooney",p:1},{g:"Patrick Cantlay",t:"Bresnahan",p:1},{g:"Jacob Bridgeman",t:"Bresnahan",p:1}],winner:"Sheehy"},
+  {name:"Farmer's Insurance Open",date:"JAN 29 – FEB 1",location:"Torrey Pines, San Diego, CA",prize:25,completed:true,
+   scorers:[{g:"Justin Rose",t:"Bresnahan",p:5},{g:"Si Woo Kim",t:"Sheehy",p:4},{g:"Pierceson Coody",t:"Sheehy",p:4},{g:"Jake Knapp",t:"Robinson",p:3},{g:"Stephan Jaeger",t:"Lynch",p:3},{g:"Andrew Novak",t:"Bingle",p:2},{g:"Sahith Theegala",t:"Descloux",p:2},{g:"Maverick McNealy",t:"Cooney",p:1}],winner:"Bresnahan"},
+  {name:"Waste Management Phoenix Open",date:"FEB 5-8",location:"TPC Scottsdale, Scottsdale, AZ",prize:25,completed:true,
+   scorers:[{g:"Chris Gotterup",t:"Descloux",p:5},{g:"Hideki Matsuyama",t:"Robinson",p:4},{g:"Scottie Scheffler",t:"Sheehy",p:3},{g:"Si Woo Kim",t:"Sheehy",p:3},{g:"Michael Thorbjornsen",t:"Jackson",p:3},{g:"Nicolai Hojgaard",t:"Cooney",p:3},{g:"Akshay Bhatia",t:"Bresnahan",p:3},{g:"Jake Knapp",t:"Robinson",p:2},{g:"Matt Fitzpatrick",t:"Descloux",p:1}],winner:"Descloux"},
+  {name:"AT&T Pebble Beach Pro-Am",date:"FEB 12-15",location:"Pebble Beach GL, Pebble Beach, CA",prize:25,completed:true,
+   scorers:[{g:"Collin Morikawa",t:"Smith Daniels",p:5},{g:"Sepp Straka",t:"Sheehy",p:4},{g:"Min Woo Lee",t:"Cooney",p:4},{g:"Scottie Scheffler",t:"Sheehy",p:3},{g:"Tommy Fleetwood",t:"Bingle",p:3},{g:"Sam Burns",t:"Cooney",p:2},{g:"Akshay Bhatia",t:"Bresnahan",p:2},{g:"Hideki Matsuyama",t:"Robinson",p:1},{g:"Jake Knapp",t:"Robinson",p:1},{g:"Shane Lowry",t:"Smith Daniels",p:1},{g:"Nico Echavarria",t:"Cooney",p:1},{g:"Jacob Bridgeman",t:"Bresnahan",p:1}],winner:"Smith Daniels"},
+  {name:"Genesis Invitational",date:"FEB 19-22",location:"Riviera CC, Pacific Palisades, CA",prize:25,completed:true,
+   scorers:[{g:"Jacob Bridgeman",t:"Bresnahan",p:5},{g:"Rory McIlroy",t:"Robinson",p:4},{g:"Adam Scott",t:"Smith Daniels",p:3},{g:"Aldrich Potgieter",t:"Descloux",p:2},{g:"Jake Knapp",t:"Robinson",p:1}],winner:"Bresnahan"},
+  {name:"Cognizant Classic in the Palm Beaches",date:"FEB 26 – MAR 1",location:"PGA National, Palm Beach Gardens, FL",prize:25,completed:true,
+   scorers:[{g:"Nico Echavarria",t:"Cooney",p:5},{g:"Shane Lowry",t:"Smith Daniels",p:4},{g:"Nicolai Hojgaard",t:"Cooney",p:2},{g:"Rasmus Hojgaard",t:"Robinson",p:1},{g:"Brooks Koepka",t:"Smith Daniels",p:1}],winner:"Cooney"},
+  {name:"Puerto Rico Open",date:"MAR 5-8",location:"Grand Reserve GC, Rio Grande, PR",prize:"POINTS ONLY",completed:true,
+   scorers:[{g:"Davis Thompson",t:"Smith Daniels",p:2},{g:"Luke Clanton",t:"Lynch",p:1}],winner:null},
+  {name:"Arnold Palmer Invitational presented by Mastercard",date:"MAR 5-8",location:"Bay Hill Club, Orlando, FL",prize:25,completed:true,
+   scorers:[{g:"Akshay Bhatia",t:"Bresnahan",p:5},{g:"Daniel Berger",t:"Jackson",p:4},{g:"Ludvig Aberg",t:"Lynch",p:3},{g:"Cam Young",t:"Lynch",p:3},{g:"Collin Morikawa",t:"Smith Daniels",p:2},{g:"Russell Henley",t:"Cooney",p:1},{g:"Min Woo Lee",t:"Cooney",p:1},{g:"Sahith Theegala",t:"Descloux",p:1}],winner:"Bresnahan"},
+  {name:"The Players Championship",date:"MAR 12-15",location:"TPC Sawgrass, Ponte Vedra Beach, FL",prize:25,completed:true,
+   scorers:[{g:"Cam Young",t:"Lynch",p:5},{g:"Matt Fitzpatrick",t:"Descloux",p:4},{g:"Xander Schauffele",t:"Jackson",p:3},{g:"Robert Macintyre",t:"Sheehy",p:2},{g:"Ludvig Aberg",t:"Lynch",p:1},{g:"Jacob Bridgeman",t:"Bresnahan",p:1}],winner:"Lynch"},
+  {name:"Valspar Championship",date:"MAR 19-22",location:"Innisbrook Resort, Palm Harbor, FL",prize:25,completed:true,
+   scorers:[{g:"Matt Fitzpatrick",t:"Descloux",p:5},{g:"Sungjae Im",t:"Sheehy",p:2},{g:"Marco Penge",t:"Bingle",p:2},{g:"Xander Schauffele",t:"Jackson",p:2},{g:"Stephan Jaeger",t:"Lynch",p:1},{g:"Patrick Cantlay",t:"Bresnahan",p:1}],winner:"Descloux"},
+  {name:"Texas Children's Houston Open",date:"MAR 26-29",location:"Memorial Park GC, Houston, TX",prize:"No Winner",completed:true,
+   scorers:[{g:"Nicolai Hojgaard",t:"Cooney",p:4},{g:"Min Woo Lee",t:"Cooney",p:3},{g:"Matt McCarty",t:"Cooney",p:3},{g:"Sam Stevens",t:"Bingle",p:2},{g:"Jake Knapp",t:"Robinson",p:1},{g:"Chris Gotterup",t:"Descloux",p:1},{g:"Jason Day",t:"Descloux",p:1}],winner:null},
+  {name:"Valero Texas Open",date:"APR 2-5",location:"TPC San Antonio, San Antonio, TX",prize:25,completed:false,scorers:[],winner:null},
+  {name:"Masters Tournament",date:"APR 9-12",location:"Augusta National GC, Augusta, GA",prize:75,completed:false,scorers:[],winner:null,major:true},
+  {name:"RBC Heritage",date:"APR 16-19",location:"Harbour Town GL, Hilton Head, SC",prize:25,completed:false,scorers:[],winner:null},
+  {name:"Zurich Classic of New Orleans",date:"APR 23-26",location:"TPC Louisiana, Avondale, LA",prize:"POINTS ONLY",completed:false,scorers:[],winner:null},
+  {name:"Cadillac Championship",date:"APR 30 – MAY 3",location:"TBA",prize:25,completed:false,scorers:[],winner:null},
+  {name:"Truist Championship",date:"MAY 7-10",location:"TBA",prize:25,completed:false,scorers:[],winner:null},
+  {name:"Myrtle Beach Classic",date:"MAY 7-10",location:"TBA",prize:"POINTS ONLY",completed:false,scorers:[],winner:null},
+  {name:"PGA Championship",date:"MAY 14-17",location:"Quail Hollow Club, Charlotte, NC",prize:50,completed:false,scorers:[],winner:null,major:true},
+  {name:"The CJ CUP Byron Nelson",date:"MAY 21-24",location:"TPC Craig Ranch, McKinney, TX",prize:25,completed:false,scorers:[],winner:null},
+  {name:"Charles Schwab Challenge",date:"MAY 28-31",location:"Colonial CC, Fort Worth, TX",prize:25,completed:false,scorers:[],winner:null},
+  {name:"The Memorial Tournament",date:"JUN 4-7",location:"Muirfield Village GC, Dublin, OH",prize:25,completed:false,scorers:[],winner:null},
+  {name:"RBC Canadian Open",date:"JUN 11-14",location:"TBA",prize:25,completed:false,scorers:[],winner:null},
+  {name:"U.S. Open",date:"JUN 18-21",location:"Oakmont CC, Oakmont, PA",prize:50,completed:false,scorers:[],winner:null,major:true},
+  {name:"Travelers Championship",date:"JUN 25-28",location:"TPC River Highlands, Cromwell, CT",prize:25,completed:false,scorers:[],winner:null},
+  {name:"John Deere Classic",date:"JUL 2-5",location:"TPC Deere Run, Silvis, IL",prize:25,completed:false,scorers:[],winner:null},
+  {name:"ISCO Championship",date:"JUL 9-12",location:"TBA",prize:"POINTS ONLY",completed:false,scorers:[],winner:null},
+  {name:"Genesis Scottish Open",date:"JUL 9-12",location:"The Renaissance Club, North Berwick, Scotland",prize:25,completed:false,scorers:[],winner:null},
+  {name:"The Open Championship",date:"JUL 16-19",location:"Royal Portrush GC, Northern Ireland",prize:50,completed:false,scorers:[],winner:null,major:true},
+  {name:"Corales Puntacana Championship",date:"JUL 16-19",location:"Puntacana Resort, DR",prize:"POINTS ONLY",completed:false,scorers:[],winner:null},
+  {name:"3M Open",date:"JUL 23-26",location:"TPC Twin Cities, Blaine, MN",prize:25,completed:false,scorers:[],winner:null},
+  {name:"Rocket Classic",date:"JUL 30 – AUG 2",location:"Detroit GC, Detroit, MI",prize:25,completed:false,scorers:[],winner:null},
+  {name:"Wyndham Championship",date:"AUG 6-9",location:"Sedgefield CC, Greensboro, NC",prize:25,completed:false,scorers:[],winner:null},
+  {name:"FedEx St. Jude Invitational",date:"AUG 13-16",location:"TPC Southwind, Memphis, TN",prize:25,completed:false,scorers:[],winner:null},
+  {name:"BMW Championship",date:"AUG 20-23",location:"TBA",prize:25,completed:false,scorers:[],winner:null},
+  {name:"TOUR Championship",date:"AUG 27-30",location:"East Lake GC, Atlanta, GA",prize:25,completed:false,scorers:[],winner:null},
+];
+
+
+// =============================================
+// RENDERING
+// =============================================
+
+function getMovement(rank, lastWeek) {
+  const diff = lastWeek - rank;
+  if (diff > 0) return '<span class="lb-movement up">\u25B2' + diff + '</span>';
+  if (diff < 0) return '<span class="lb-movement down">\u25BC' + Math.abs(diff) + '</span>';
+  return '<span class="lb-movement same">\u2014</span>';
+}
+
+function renderLeaderboard() {
+  // Latest result banner
+  const lastCompleted = [...TOURNAMENTS].reverse().find(t => t.completed);
+  if (lastCompleted) {
+    const banner = document.getElementById('latest-banner');
+    const winnerText = lastCompleted.winner
+      ? 'GNerd Bucks: ' + lastCompleted.winner + ' \u00B7 ' + (lastCompleted.scorers[0]?.g || '') + ' (' + lastCompleted.scorers[0]?.p + 'pts)'
+      : 'No GNerd Bucks this week';
+    banner.innerHTML =
+      '<div class="label">Latest Result</div>' +
+      '<div class="tourney">' + lastCompleted.name + '</div>' +
+      '<div class="detail">' + lastCompleted.date + ' \u00B7 ' + winnerText + '</div>';
+  }
+
+  // Events done counter
+  const done = TOURNAMENTS.filter(t => t.completed).length;
+  document.getElementById('pp-events').textContent = done + '/' + TOURNAMENTS.length;
+
+  // Team count
+  document.getElementById('team-count-badge').textContent = LEADERBOARD.length + ' Teams';
+
+  var SEASON_BONUS = {1: 500, 2: 300, 3: 100};
+  const list = document.getElementById('leaderboard-list');
+  list.innerHTML = LEADERBOARD.map(function(t) {
+    var bonus = SEASON_BONUS[t.rank];
+    return '<div class="lb-row" onclick="openTeamModal(\'' + t.team.replace(/'/g, "\\'") + '\')">' +
+      '<div class="lb-rank ' + (t.rank <= 3 ? 'gold' : '') + '">' + t.rank + '</div>' +
+      '<div class="lb-info">' +
+        '<div class="lb-name">' + t.team + '</div>' +
+        '<div class="lb-meta">' +
+          getMovement(t.rank, t.lastWeek) +
+          '<span class="pill pill-wins">\uD83C\uDFC6 ' + t.wins + ' Win' + (t.wins !== 1 ? 's' : '') + '</span>' +
+          '<span class="pill pill-bucks">\uD83D\uDCB0 ' + t.cash + ' GNerd Bucks</span>' +
+          (bonus ? '<span class="lb-season-bonus">\uD83C\uDFC6 ' + bonus + ' GB Season Bonus</span>' : '') +
+        '</div>' +
+      '</div>' +
+      '<div class="lb-pts">' +
+        '<div class="lb-pts-num">' + t.points + '</div>' +
+        '<div class="lb-pts-label">pts</div>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function renderResults() {
+  var list = document.getElementById('results-list');
+  var completed = TOURNAMENTS.filter(t => t.completed).reverse();
+  var upcoming = TOURNAMENTS.filter(t => !t.completed);
+  var nextUp = upcoming[0];
+
+  list.innerHTML = completed.map(function(t, i) {
+    var prizeClass = typeof t.prize === 'number' ? (t.prize >= 50 ? 'major' : 'cash')
+      : (t.prize === 'POINTS ONLY' ? 'pts-only' : 'no-winner');
+    var prizeText = typeof t.prize === 'number' ? t.prize + ' GB' : t.prize;
+    return '<div class="card tourney-card ' + (i === 0 ? 'open' : '') + '" onclick="toggleTourney(this)">' +
+      '<div class="tourney-header">' +
+        '<div>' +
+          '<div class="tourney-name">' + t.name + '</div>' +
+          '<div class="tourney-date">' + t.date + ' \u00B7 ' + t.location + '</div>' +
+        '</div>' +
+        '<span class="tourney-prize ' + prizeClass + '">' + prizeText + '</span>' +
+      '</div>' +
+      '<div class="tourney-body">' +
+        t.scorers.map(function(s) {
+          return '<div class="scorer-row">' +
+            '<div class="scorer-pts p' + s.p + '">' + s.p + '</div>' +
+            '<div class="scorer-name">' + s.g + '</div>' +
+            '<div class="scorer-team">' + s.t + '</div>' +
+          '</div>';
+        }).join('') +
+        (t.winner ? '<div class="winner-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15 8.5L22 9.3L17 14L18.2 21L12 17.8L5.8 21L7 14L2 9.3L9 8.5Z"/></svg>GNerd Bucks: ' + t.winner + '</div>' : '') +
+      '</div>' +
+    '</div>';
+  }).join('') +
+  '<div class="page-title" style="margin-top:16px">Upcoming</div>' +
+  upcoming.map(function(t) {
+    var prizeClass = typeof t.prize === 'number' ? (t.prize >= 50 ? 'major' : 'cash')
+      : (t.prize === 'POINTS ONLY' ? 'pts-only' : 'no-winner');
+    var prizeText = typeof t.prize === 'number' ? t.prize + ' GB' : t.prize;
+    var isNext = t === nextUp;
+    return '<div class="card tourney-card upcoming">' +
+      '<div class="tourney-header">' +
+        '<div>' +
+          '<div class="tourney-name">' + (t.major ? '\u26F3 ' : '') + t.name + '</div>' +
+          '<div class="tourney-date">' + t.date + (t.location ? ' \u00B7 ' + t.location : '') + '</div>' +
+        '</div>' +
+        '<span class="tourney-prize ' + prizeClass + '">' + (isNext ? 'NEXT' : prizeText) + '</span>' +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function toggleTourney(el) {
+  if (el.classList.contains('upcoming')) return;
+  el.classList.toggle('open');
+}
+
+function renderRosters() {
+  var chips = document.getElementById('team-chips');
+  var panels = document.getElementById('roster-panels');
+  var teamNames = LEADERBOARD.map(t => t.team);
+
+  chips.innerHTML = teamNames.map(function(name, i) {
+    return '<button class="team-chip ' + (i === 0 ? 'active' : '') + '" onclick="switchTeam(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</button>';
+  }).join('');
+
+  panels.innerHTML = teamNames.map(function(name, i) {
+    var team = TEAMS[name];
+    if (!team) return '';
+    var lb = LEADERBOARD.find(t => t.team === name);
+    var sortedGolfers = [...team.golfers].sort((a, b) => b.total - a.total);
+    return '<div class="roster-panel ' + (i === 0 ? 'active' : '') + '" id="roster-' + name.replace(/\s/g, '-') + '">' +
+      '<div class="roster-stats">' +
+        '<div class="roster-stat"><div class="val">' + team.totalPoints + '</div><div class="label">Points</div></div>' +
+        '<div class="roster-stat"><div class="val">' + team.wins + '</div><div class="label">Wins</div></div>' +
+        '<div class="roster-stat"><div class="val">#' + (lb?.rank || '—') + '</div><div class="label">Rank</div></div>' +
+      '</div>' +
+      '<div class="card">' +
+        '<div class="card-header"><h3>' + (OWNER_MAP[name] || name) + '</h3><span class="badge">Rd ' + (sortedGolfers[0]?.pick || '—') + ' Pick</span></div>' +
+        sortedGolfers.map(function(g) {
+          var scoreList = Object.entries(g.scores).map(function(e) { return e[0].split(' ').slice(0, 2).join(' ') + ' (' + e[1] + ')'; }).join(', ');
+          return '<div class="golfer-row">' +
+            '<div class="golfer-pick">R' + g.pick + '</div>' +
+            '<div class="lb-info">' +
+              '<div class="golfer-name">' + g.name + '</div>' +
+              '<div class="golfer-scores">' + (scoreList || 'No points yet') + '</div>' +
+            '</div>' +
+            '<div class="golfer-total">' + g.total + '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>' +
+    '</div>';
+  }).join('');
+}
+
+function switchTeam(name, btn) {
+  document.querySelectorAll('.team-chip').forEach(c => c.classList.remove('active'));
+  document.querySelectorAll('.roster-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  var panel = document.getElementById('roster-' + name.replace(/\s/g, '-'));
+  if (panel) panel.classList.add('active');
+}
+
+function renderSchedule() {
+  var list = document.getElementById('schedule-list');
+  var months = {};
+  var nextTourney = TOURNAMENTS.find(t => !t.completed);
+  var monthMap = {JAN:'January',FEB:'February',MAR:'March',APR:'April',MAY:'May',May:'May',JUN:'June',JUL:'July',AUG:'August',SEP:'September',OCT:'October',NOV:'November',DEC:'December'};
+
+  TOURNAMENTS.forEach(function(t) {
+    var monthKey = (t.date || '').split(' ')[0];
+    var month = monthMap[monthKey] || monthKey;
+    if (!months[month]) months[month] = [];
+    months[month].push(t);
+  });
+
+  list.innerHTML = Object.entries(months).map(function(entry) {
+    var month = entry[0], events = entry[1];
+    return '<div class="schedule-month">' +
+      '<h3>' + month + '</h3>' +
+      events.map(function(t) {
+        var isMajor = t.major;
+        var isNext = t === nextTourney;
+        var statusClass = t.completed ? 'done' : isNext ? 'next' : 'future';
+        var statusText = t.completed ? '\u2713' : isNext ? 'NEXT' : t.date.split(' ').slice(1).join(' ');
+        return '<div class="sched-row">' +
+          '<div class="sched-date">' + t.date + '</div>' +
+          '<div class="sched-name ' + (isMajor ? 'major' : '') + '">' + (isMajor ? '\u26F3 ' : '') + t.name + '</div>' +
+          '<span class="sched-status ' + statusClass + '">' + statusText + '</span>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+  }).join('');
+}
+
+// Team detail modal
+function openTeamModal(teamName) {
+  var team = TEAMS[teamName];
+  var lb = LEADERBOARD.find(t => t.team === teamName);
+  if (!team || !lb) return;
+
+  document.getElementById('modal-team-name').textContent = teamName;
+  var body = document.getElementById('modal-body');
+  var sortedGolfers = [...team.golfers].sort((a, b) => b.total - a.total);
+
+  body.innerHTML =
+    '<div class="roster-stats">' +
+      '<div class="roster-stat"><div class="val">' + team.totalPoints + '</div><div class="label">Points</div></div>' +
+      '<div class="roster-stat"><div class="val">' + team.wins + '</div><div class="label">Wins</div></div>' +
+      '<div class="roster-stat"><div class="val">' + lb.cash + '</div><div class="label">GNerd Bucks</div></div>' +
+    '</div>' +
+    '<div class="card">' +
+      '<div class="card-header"><h3>Roster</h3><span class="badge">Rank #' + lb.rank + '</span></div>' +
+      sortedGolfers.map(function(g) {
+        var scoreList = Object.entries(g.scores).map(function(e) { return e[0].split(' ').slice(0, 3).join(' ') + ' (' + e[1] + ')'; }).join(', ');
+        return '<div class="golfer-row">' +
+          '<div class="golfer-pick">R' + g.pick + '</div>' +
+          '<div class="lb-info">' +
+            '<div class="golfer-name">' + g.name + '</div>' +
+            '<div class="golfer-scores">' + (scoreList || 'No points yet') + '</div>' +
+          '</div>' +
+          '<div class="golfer-total">' + g.total + '</div>' +
+        '</div>';
+      }).join('') +
+    '</div>';
+
+  document.getElementById('team-modal').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  document.getElementById('team-modal').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.getElementById('team-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// Navigation
+function switchPage(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  document.querySelector('[data-page="' + page + '"]').classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function renderAll() {
+  renderLeaderboard();
+  renderResults();
+  renderRosters();
+  renderSchedule();
+}
+
+// =============================================
+// STATUS INDICATOR
+// =============================================
+function setStatus(type, msg) {
+  var dot = document.getElementById('status-dot');
+  var text = document.getElementById('status-text');
+  dot.className = 'dot ' + type;
+  text.textContent = msg;
+}
+
+// =============================================
+// INITIALIZATION
+// =============================================
+(async function init() {
+  // 1. Render immediately with fallback data
+  LEADERBOARD = FALLBACK_LEADERBOARD;
+  TEAMS = FALLBACK_TEAMS;
+  TOURNAMENTS = FALLBACK_TOURNAMENTS;
+  renderAll();
+
+  // 2. Try fetching live data
+  try {
+    setStatus('loading', 'Loading live data...');
+    var data = await fetchLiveData();
+
+    if (data.leaderboard && data.leaderboard.length > 0) {
+      // Add owner field if missing
+      data.leaderboard.forEach(function(t) {
+        if (!t.owner) t.owner = OWNER_MAP[t.team] || t.team;
+      });
+
+      LEADERBOARD = data.leaderboard;
+      TEAMS = data.teams;
+      TOURNAMENTS = data.tournaments;
+      renderAll();
+
+      var now = new Date();
+      var timeStr = now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
+      setStatus('live', 'Live from Google Sheets \u00B7 ' + timeStr);
+    } else {
+      throw new Error('Empty data');
+    }
+  } catch (e) {
+    console.warn('Live data fetch failed, using fallback:', e);
+    var isFile = window.location.protocol === 'file:';
+    var msg = isFile
+      ? 'Offline \u00B7 Deploy to GitHub Pages for live data'
+      : 'Using cached data \u00B7 ' + e.message;
+    setStatus('offline', msg);
+  }
+})();
+</script>
+</body>
+</html>
