@@ -328,6 +328,11 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 // =============================================
 const CONFIG = {
   BASE_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPAhkOe120qXwoVIXrbmYSVEWCAr3ZqvlOSCdZkoq5XGVoFOS8uXFxnOEEhl5sH3FITSE0bmjSIzyG',
+  GIDS: {
+    leaderboard: '1127954248',
+    scoreboard:  '1980272692',
+    draft:       '822107203',
+  },
   CACHE_KEY: 'gnl_cache',
   CACHE_TTL: 5 * 60 * 1000, // 5 min
 };
@@ -639,9 +644,18 @@ async function discoverGIDs() {
 
 // ---- Fetch a single sheet as CSV by GID ----
 async function fetchSheetCSV(gid) {
-  const url = CONFIG.BASE_URL + '/pub?gid=' + gid + '&single=true&output=csv';
-  const resp = await fetch(url);
-  if (!resp.ok) throw new Error('CSV gid=' + gid + ' HTTP ' + resp.status);
+  // Try CSV first, then TSV as fallback
+  var url = CONFIG.BASE_URL + '/pub?gid=' + gid + '&single=true&output=csv';
+  var resp = await fetch(url, { redirect: 'follow' });
+  if (!resp.ok) {
+    // Some published sheets only serve TSV
+    url = CONFIG.BASE_URL + '/pub?gid=' + gid + '&single=true&output=tsv';
+    resp = await fetch(url, { redirect: 'follow' });
+    if (!resp.ok) throw new Error('CSV/TSV gid=' + gid + ' HTTP ' + resp.status);
+    var text = await resp.text();
+    // Convert TSV to CSV
+    return parseCSV(text.replace(/\t/g, ','));
+  }
   return parseCSV(await resp.text());
 }
 
@@ -658,66 +672,41 @@ async function fetchLiveData() {
 
   let sheets = { leaderboard: null, scoreboard: null, draft: null };
 
-  // ── Strategy 1: Discover GIDs via pubhtml, then fetch individual CSVs ──
+  // ── Primary strategy: Fetch CSVs using hardcoded GIDs ──
   try {
-    const gidMap = await discoverGIDs();
-    console.log('Discovered GIDs:', gidMap);
-
-    const lbGid  = gidMap['2026 Leaderboard'];
-    const sbGid  = gidMap['2026 Season Scoreboard'];
-    const drGid  = gidMap['2026 DRAFT'];
-
-    if (lbGid && sbGid) {
-      const fetches = [fetchSheetCSV(lbGid), fetchSheetCSV(sbGid)];
-      if (drGid) fetches.push(fetchSheetCSV(drGid));
-      const results = await Promise.all(fetches);
-      sheets.leaderboard = results[0];
-      sheets.scoreboard  = results[1];
-      if (results[2]) sheets.draft = results[2];
-      console.log('CSV fetch succeeded via GID discovery');
-    } else {
-      throw new Error('GIDs not found for required sheets');
-    }
+    const results = await Promise.all([
+      fetchSheetCSV(CONFIG.GIDS.leaderboard),
+      fetchSheetCSV(CONFIG.GIDS.scoreboard),
+      fetchSheetCSV(CONFIG.GIDS.draft),
+    ]);
+    sheets.leaderboard = results[0];
+    sheets.scoreboard  = results[1];
+    sheets.draft       = results[2];
+    console.log('CSV fetch succeeded via hardcoded GIDs');
   } catch (e1) {
-    console.warn('Strategy 1 (GID discovery + CSV) failed:', e1.message);
+    console.warn('Primary fetch (hardcoded GIDs) failed:', e1.message);
 
-    // ── Strategy 2: Fetch default CSV (gid=0) + try pubhtml table parsing ──
+    // ── Fallback: Try GID discovery from pubhtml ──
     try {
-      // gid=0 is typically the first sheet (Leaderboard)
-      const lbCSV = await fetchSheetCSV('0');
-      sheets.leaderboard = lbCSV;
-      console.log('Fetched leaderboard via gid=0');
-
-      // For scoreboard, try pubhtml table parsing as fallback
-      const resp = await fetch(CONFIG.BASE_URL + '/pubhtml');
-      const html = await resp.text();
-      const doc = new DOMParser().parseFromString(html, 'text/html');
-      const tables = Array.from(doc.querySelectorAll('table'));
-      for (const table of tables) {
-        const arr = tableToArray(table);
-        if (!arr || arr.length < 10) continue;
-        const top = arr.slice(0, 6).map(r => (r || []).join(' ').toLowerCase()).join(' ');
-        if (top.includes('date') && top.includes('tournament') && top.includes('location')) {
-          sheets.scoreboard = arr;
-        }
-        if (top.includes('pick') && top.includes('round 1')) {
-          sheets.draft = arr;
-        }
+      const gidMap = await discoverGIDs();
+      console.log('Discovered GIDs:', gidMap);
+      const lbGid = gidMap['2026 Leaderboard'];
+      const sbGid = gidMap['2026 Season Scoreboard'];
+      const drGid = gidMap['2026 DRAFT'];
+      if (lbGid && sbGid) {
+        const fetches = [fetchSheetCSV(lbGid), fetchSheetCSV(sbGid)];
+        if (drGid) fetches.push(fetchSheetCSV(drGid));
+        const results = await Promise.all(fetches);
+        sheets.leaderboard = results[0];
+        sheets.scoreboard  = results[1];
+        if (results[2]) sheets.draft = results[2];
+        console.log('CSV fetch succeeded via GID discovery');
+      } else {
+        throw new Error('GIDs not found');
       }
     } catch (e2) {
-      console.warn('Strategy 2 (gid=0 + pubhtml) failed:', e2.message);
-
-      // ── Strategy 3: Pure pubhtml table parsing ──
-      try {
-        const resp = await fetch(CONFIG.BASE_URL + '/pubhtml');
-        const html = await resp.text();
-        const doc = new DOMParser().parseFromString(html, 'text/html');
-        const tables = Array.from(doc.querySelectorAll('table'));
-        const identified = identifySheets(tables);
-        sheets = identified;
-      } catch (e3) {
-        throw new Error('All fetch strategies failed. If opening from a file, deploy to GitHub Pages for live data.');
-      }
+      console.warn('Fallback (GID discovery) failed:', e2.message);
+      throw new Error('All fetch strategies failed. Check that the Google Sheet is published to web.');
     }
   }
 
