@@ -44,6 +44,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .brand-icon{width:40px;height:40px;flex-shrink:0}
 .brand h1{font-family:'DM Serif Display',serif;font-size:22px;font-weight:400;letter-spacing:-.3px;line-height:1.2}
 .brand-sub{font-size:12px;color:var(--the-green);letter-spacing:.5px;text-transform:uppercase;margin-left:50px;margin-top:-2px}
+.league-name{display:inline-block;margin-left:50px;margin-top:6px;background:var(--gnerd-gold);color:var(--deep-rough);font-size:12px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:4px}
 .season-badge{position:absolute;top:0;right:0;background:var(--fairway);border-radius:6px;padding:4px 10px;font-size:11px;font-weight:600;letter-spacing:.3px;color:#ffffff}
 
 /* === LIVE DATA INDICATOR === */
@@ -242,6 +243,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
       <h1>Golf Nerd Leagues</h1>
     </div>
     <div class="brand-sub">For people who actually watch golf</div>
+    <div class="league-name" id="league-name">TSI League</div>
     <div class="season-badge">2026 SEASON</div>
   </div>
 </header>
@@ -327,6 +329,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 // CONFIGURATION
 // =============================================
 const CONFIG = {
+  LEAGUE_NAME: 'TSI',
   BASE_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPAhkOe120qXwoVIXrbmYSVEWCAr3ZqvlOSCdZkoq5XGVoFOS8uXFxnOEEhl5sH3FITSE0bmjSIzyG',
   GIDS: {
     leaderboard: '1127954248',
@@ -582,7 +585,8 @@ function parseScoreboard(arr, draftMap, leaderboard) {
     scorers.sort((a, b) => b.p - a.p);
 
     const completed = scorers.length > 0;
-    let prize = /^\d+$/.test(t.prize) ? parseInt(t.prize) : t.prize;
+    let prizeRaw = String(t.prize || '').replace(/[$,]/g, '').trim();
+    let prize = /^\d+$/.test(prizeRaw) ? parseInt(prizeRaw) : t.prize;
 
     // Determine weekly winner
     let winner = null;
@@ -1176,6 +1180,11 @@ function setStatus(type, msg) {
 // INITIALIZATION
 // =============================================
 (async function init() {
+  // Set league name from config
+  if (CONFIG.LEAGUE_NAME) {
+    document.getElementById('league-name').textContent = CONFIG.LEAGUE_NAME + ' League';
+  }
+
   // 1. Render immediately with fallback data
   LEADERBOARD = FALLBACK_LEADERBOARD;
   TEAMS = FALLBACK_TEAMS;
