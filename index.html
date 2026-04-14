@@ -243,7 +243,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
       <h1>Golf Nerd Leagues</h1>
     </div>
     <div class="brand-sub">For people who actually watch golf</div>
-    <div class="league-name" id="league-name">TSI League</div>
+    <div class="league-name" id="league-name">TSI Fantasy League</div>
     <div class="season-badge">2026 SEASON</div>
   </div>
 </header>
@@ -329,7 +329,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 // CONFIGURATION
 // =============================================
 const CONFIG = {
-  LEAGUE_NAME: 'TSI',
+  LEAGUE_NAME: 'TSI Fantasy League',
   BASE_URL: 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSPAhkOe120qXwoVIXrbmYSVEWCAr3ZqvlOSCdZkoq5XGVoFOS8uXFxnOEEhl5sH3FITSE0bmjSIzyG',
   GIDS: {
     leaderboard: '1127954248',
@@ -429,16 +429,19 @@ function parseLeaderboard(arr) {
   if (hdr === -1) return null;
 
   const headers = arr[hdr].map(c => (c || '').toLowerCase().trim());
+  console.log('Leaderboard headers:', headers);
   const col = {
     lastWeek: headers.indexOf('last week'),
     rank:     headers.indexOf('rank'),
     team:     headers.indexOf('team'),
     points:   headers.indexOf('points'),
     wins:     headers.indexOf('wins'),
-    cash:     headers.findIndex(h => h.includes('weekly')),
-    topPayout:headers.findIndex(h => h.includes('top team') || h.includes('top payout')),
+    cash:     headers.findIndex(h => h.includes('weekly') || h.includes('gnerd bucks') || h.includes('cash') || h.includes('winnings') || h.includes('gb won')),
+    topPayout:headers.findIndex(h => h.includes('top team') || h.includes('top payout') || h.includes('season bonus')),
     total:    headers.indexOf('total'),
   };
+
+  function cleanNum(val) { return parseInt(String(val || '').replace(/[$,]/g, '')) || 0; }
 
   const teams = [];
   for (let i = hdr + 1; i < arr.length; i++) {
@@ -447,15 +450,15 @@ function parseLeaderboard(arr) {
     const team = (r[col.team] || '').trim();
     if (!team) break;
     teams.push({
-      rank:     parseInt(r[col.rank]) || teams.length + 1,
-      lastWeek: parseInt(r[col.lastWeek]) || 0,
+      rank:     cleanNum(r[col.rank]) || teams.length + 1,
+      lastWeek: cleanNum(r[col.lastWeek]),
       team,
       owner:    OWNER_MAP[team] || team,
-      points:   parseInt(r[col.points]) || 0,
-      wins:     parseInt(r[col.wins]) || 0,
-      cash:     parseInt(r[col.cash]) || 0,
-      topPayout:parseInt(r[col.topPayout]) || 0,
-      total:    parseInt(r[col.total]) || 0,
+      points:   cleanNum(r[col.points]),
+      wins:     cleanNum(r[col.wins]),
+      cash:     cleanNum(r[col.cash]),
+      topPayout:cleanNum(r[col.topPayout]),
+      total:    cleanNum(r[col.total]),
     });
   }
   return teams.length ? teams : null;
@@ -585,8 +588,11 @@ function parseScoreboard(arr, draftMap, leaderboard) {
     scorers.sort((a, b) => b.p - a.p);
 
     const completed = scorers.length > 0;
-    let prizeRaw = String(t.prize || '').replace(/[$,]/g, '').trim();
-    let prize = /^\d+$/.test(prizeRaw) ? parseInt(prizeRaw) : t.prize;
+    let prizeRaw = String(t.prize || '').replace(/[$,\s]/g, '').trim();
+    let prize = /^\d+(\.\d+)?$/.test(prizeRaw) ? parseInt(prizeRaw) : t.prize;
+    // Normalize string prizes — strip any remaining $ signs
+    if (typeof prize === 'string') prize = prize.replace(/[$]/g, '').trim();
+    if (typeof prize === 'string' && /^\d+$/.test(prize)) prize = parseInt(prize);
 
     // Determine weekly winner
     let winner = null;
@@ -1182,7 +1188,7 @@ function setStatus(type, msg) {
 (async function init() {
   // Set league name from config
   if (CONFIG.LEAGUE_NAME) {
-    document.getElementById('league-name').textContent = CONFIG.LEAGUE_NAME + ' League';
+    document.getElementById('league-name').textContent = CONFIG.LEAGUE_NAME;
   }
 
   // 1. Render immediately with fallback data
