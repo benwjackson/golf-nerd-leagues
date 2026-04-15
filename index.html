@@ -87,7 +87,8 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .lb-rank.gold{color:var(--bucks-text);font-weight:700}
 .lb-info{min-width:0}
 .lb-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lb-meta{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.lb-meta{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;gap:4px;flex-wrap:nowrap;align-items:center;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.lb-meta::-webkit-scrollbar{display:none}
 .lb-pts{text-align:right}
 .lb-pts-num{font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough);line-height:1}
 .lb-pts-label{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;text-align:right}
@@ -131,9 +132,11 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .scorer-pts.p3{background:var(--the-green-light);color:var(--deep-rough)}
 .scorer-pts.p2{background:var(--the-green-pale);color:var(--fairway)}
 .scorer-pts.p1{background:var(--fog-dark);color:var(--text-muted)}
-.scorer-name{font-size:13px;font-weight:500;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.scorer-name{font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .scorer-team{font-size:11px;color:var(--text-muted);flex-shrink:0}
-.winner-badge{display:inline-flex;align-items:center;gap:4px;background:var(--gold-tint);color:var(--wins-text);font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px;margin-top:8px}
+.scorer-winner{background:var(--gold-tint);border-radius:6px;padding:6px 8px;margin:2px 0}
+.scorer-winner .scorer-name{white-space:normal}
+.scorer-gb-badge{display:inline;font-size:11px;font-weight:600;color:var(--wins-text);margin-left:4px}
 .upcoming-tag{font-size:11px;color:var(--text-light);font-style:italic}
 
 /* Completed vs upcoming styling */
@@ -594,14 +597,12 @@ function parseScoreboard(arr, draftMap, leaderboard) {
     if (typeof prize === 'string') prize = prize.replace(/[$]/g, '').trim();
     if (typeof prize === 'string' && /^\d+$/.test(prize)) prize = parseInt(prize);
 
-    // Determine weekly winner
+    // Determine weekly winner — team with a 5-point (1st place) scorer wins GNerd Bucks
     let winner = null;
     if (completed && typeof prize === 'number') {
-      const totals = {};
-      scorers.forEach(s => { totals[s.t] = (totals[s.t] || 0) + s.p; });
-      const sorted = Object.entries(totals).sort((a, b) => b[1] - a[1]);
-      if (sorted.length > 0 && (sorted.length === 1 || sorted[0][1] > sorted[1][1])) {
-        winner = sorted[0][0];
+      const fivePointScorer = scorers.find(s => s.p === 5);
+      if (fivePointScorer) {
+        winner = fivePointScorer.t;
       }
     }
 
@@ -934,7 +935,7 @@ function getMovement(rank, lastWeek) {
   const diff = lastWeek - rank;
   if (diff > 0) return '<span class="lb-movement up">\u25B2' + diff + '</span>';
   if (diff < 0) return '<span class="lb-movement down">\u25BC' + Math.abs(diff) + '</span>';
-  return '<span class="lb-movement same">\u2014</span>';
+  return '';
 }
 
 function renderLeaderboard() {
@@ -970,7 +971,7 @@ function renderLeaderboard() {
           getMovement(t.rank, t.lastWeek) +
           '<span class="pill pill-wins">\uD83C\uDFC6 ' + t.wins + ' Win' + (t.wins !== 1 ? 's' : '') + '</span>' +
           '<span class="pill pill-bucks">\uD83D\uDCB0 ' + t.cash + ' GNerd Bucks</span>' +
-          (bonus ? '<span class="lb-season-bonus">\uD83C\uDFC6 ' + bonus + ' GB Season Bonus</span>' : '') +
+          (bonus ? '<span class="lb-season-bonus">+' + bonus + ' GB</span>' : '') +
         '</div>' +
       '</div>' +
       '<div class="lb-pts">' +
@@ -1001,13 +1002,13 @@ function renderResults() {
       '</div>' +
       '<div class="tourney-body">' +
         t.scorers.map(function(s) {
-          return '<div class="scorer-row">' +
+          var isWinner = s.p === 5 && t.winner === s.t;
+          return '<div class="scorer-row' + (isWinner ? ' scorer-winner' : '') + '">' +
             '<div class="scorer-pts p' + s.p + '">' + s.p + '</div>' +
-            '<div class="scorer-name">' + s.g + '</div>' +
-            '<div class="scorer-team">' + s.t + '</div>' +
+            '<div class="scorer-name">' + s.g + (isWinner ? ' <span class="scorer-gb-badge">\u2B50 GNerd Bucks \u00B7 ' + s.t + '</span>' : '') + '</div>' +
+            '<div class="scorer-team">' + (isWinner ? '' : s.t) + '</div>' +
           '</div>';
         }).join('') +
-        (t.winner ? '<div class="winner-badge"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15 8.5L22 9.3L17 14L18.2 21L12 17.8L5.8 21L7 14L2 9.3L9 8.5Z"/></svg>GNerd Bucks: ' + t.winner + '</div>' : '') +
       '</div>' +
     '</div>';
   }).join('') +
@@ -1062,7 +1063,7 @@ function renderRosters() {
             '<div class="golfer-pick">R' + g.pick + '</div>' +
             '<div class="lb-info">' +
               '<div class="golfer-name">' + g.name + '</div>' +
-              '<div class="golfer-scores">' + (scoreList || 'No points yet') + '</div>' +
+              '<div class="golfer-scores">' + (scoreList || '') + '</div>' +
             '</div>' +
             '<div class="golfer-total">' + g.total + '</div>' +
           '</div>';
@@ -1136,7 +1137,7 @@ function openTeamModal(teamName) {
           '<div class="golfer-pick">R' + g.pick + '</div>' +
           '<div class="lb-info">' +
             '<div class="golfer-name">' + g.name + '</div>' +
-            '<div class="golfer-scores">' + (scoreList || 'No points yet') + '</div>' +
+            '<div class="golfer-scores">' + (scoreList || '') + '</div>' +
           '</div>' +
           '<div class="golfer-total">' + g.total + '</div>' +
         '</div>';
