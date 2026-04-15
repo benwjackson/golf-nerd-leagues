@@ -154,7 +154,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .roster-stat .label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
 .golfer-row{display:grid;grid-template-columns:28px 1fr auto;align-items:center;padding:10px 14px;border-bottom:1px solid var(--fog-dark);gap:10px}
 .golfer-row:last-child{border-bottom:none}
-.golfer-pick{font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-light);text-align:center}
+.golfer-pick{font-size:11px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--text-light);text-align:center;min-width:22px}
 .golfer-name{font-size:14px;font-weight:500}
 .golfer-scores{font-size:11px;color:var(--text-muted);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .golfer-total{font-size:16px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough)}
@@ -1044,10 +1044,15 @@ function renderRosters() {
     return '<button class="team-chip ' + (i === 0 ? 'active' : '') + '" onclick="switchTeam(\'' + name.replace(/'/g, "\\'") + '\', this)">' + name + '</button>';
   }).join('');
 
+  // Reverse lookup: team name → draft position
+  var DRAFT_POS = {};
+  Object.entries(DRAFT_ORDER).forEach(function(e) { DRAFT_POS[e[1]] = e[0]; });
+
   panels.innerHTML = teamNames.map(function(name, i) {
     var team = TEAMS[name];
     if (!team) return '';
     var lb = LEADERBOARD.find(t => t.team === name);
+    var draftPos = DRAFT_POS[name] || '—';
     var sortedGolfers = [...team.golfers].sort((a, b) => b.total - a.total);
     return '<div class="roster-panel ' + (i === 0 ? 'active' : '') + '" id="roster-' + name.replace(/\s/g, '-') + '">' +
       '<div class="roster-stats">' +
@@ -1056,7 +1061,7 @@ function renderRosters() {
         '<div class="roster-stat"><div class="val">#' + (lb?.rank || '—') + '</div><div class="label">Rank</div></div>' +
       '</div>' +
       '<div class="card">' +
-        '<div class="card-header"><h3>' + (OWNER_MAP[name] || name) + '</h3><span class="badge">Rd ' + (sortedGolfers[0]?.pick || '—') + ' Pick</span></div>' +
+        '<div class="card-header"><h3>' + (OWNER_MAP[name] || name) + '</h3><span class="badge">Draft Position: ' + draftPos + '</span></div>' +
         sortedGolfers.map(function(g) {
           var scoreList = Object.entries(g.scores).map(function(e) { return e[0].split(' ').slice(0, 2).join(' ') + ' (' + e[1] + ')'; }).join(', ');
           return '<div class="golfer-row">' +
