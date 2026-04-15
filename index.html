@@ -87,8 +87,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .lb-rank.gold{color:var(--bucks-text);font-weight:700}
 .lb-info{min-width:0}
 .lb-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.lb-meta{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;gap:4px;flex-wrap:nowrap;align-items:center;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.lb-meta::-webkit-scrollbar{display:none}
+.lb-meta{font-size:12px;color:var(--text-muted);margin-top:3px;display:flex;gap:4px;flex-wrap:wrap;align-items:center}
 .lb-pts{text-align:right}
 .lb-pts-num{font-size:20px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough);line-height:1}
 .lb-pts-label{font-size:10px;color:var(--text-light);text-transform:uppercase;letter-spacing:.5px;text-align:right}
@@ -135,8 +134,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .scorer-name{font-size:13px;font-weight:500;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis}
 .scorer-team{font-size:11px;color:var(--text-muted);flex-shrink:0}
 .scorer-winner{background:var(--gold-tint);border-radius:6px;padding:6px 8px;margin:2px 0}
-.scorer-winner .scorer-name{white-space:normal}
-.scorer-gb-badge{display:inline;font-size:11px;font-weight:600;color:var(--wins-text);margin-left:4px}
+.scorer-gb-badge{font-size:11px;font-weight:600;color:var(--wins-text);flex-shrink:0;text-align:right;white-space:nowrap}
 .upcoming-tag{font-size:11px;color:var(--text-light);font-style:italic}
 
 /* Completed vs upcoming styling */
@@ -971,7 +969,7 @@ function renderLeaderboard() {
           getMovement(t.rank, t.lastWeek) +
           '<span class="pill pill-wins">\uD83C\uDFC6 ' + t.wins + ' Win' + (t.wins !== 1 ? 's' : '') + '</span>' +
           '<span class="pill pill-bucks">\uD83D\uDCB0 ' + t.cash + ' GNerd Bucks</span>' +
-          (bonus ? '<span class="lb-season-bonus">+' + bonus + ' GB</span>' : '') +
+          (bonus ? '<span class="lb-season-bonus">\uD83C\uDFC6 ' + bonus + ' GB Season Bonus</span>' : '') +
         '</div>' +
       '</div>' +
       '<div class="lb-pts">' +
@@ -1005,8 +1003,8 @@ function renderResults() {
           var isWinner = s.p === 5 && t.winner === s.t;
           return '<div class="scorer-row' + (isWinner ? ' scorer-winner' : '') + '">' +
             '<div class="scorer-pts p' + s.p + '">' + s.p + '</div>' +
-            '<div class="scorer-name">' + s.g + (isWinner ? ' <span class="scorer-gb-badge">\u2B50 GNerd Bucks \u00B7 ' + s.t + '</span>' : '') + '</div>' +
-            '<div class="scorer-team">' + (isWinner ? '' : s.t) + '</div>' +
+            '<div class="scorer-name">' + s.g + '</div>' +
+            (isWinner ? '<div class="scorer-gb-badge">\u2B50 GNerd Bucks \u00B7 ' + s.t + '</div>' : '<div class="scorer-team">' + s.t + '</div>') +
           '</div>';
         }).join('') +
       '</div>' +
