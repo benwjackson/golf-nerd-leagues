@@ -104,7 +104,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 
 /* Prize Pool */
 .prize-pool{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.lb-season-bonus{font-size:10px;font-weight:600;color:var(--bucks-text);background:var(--gold-tint);padding:2px 8px;border-radius:10px;margin-top:3px;display:inline-block}
+.lb-season-bonus{font-size:10px;font-weight:600;color:var(--bucks-text);background:var(--bucks-bg);padding:2px 8px;border-radius:10px;margin-top:3px;display:inline-block}
 .prize-box{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;text-align:center}
 .prize-box .amount{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough)}
 .prize-box .desc{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
@@ -972,7 +972,7 @@ function renderLeaderboard() {
           '<span class="pill pill-wins">\uD83C\uDFC6 ' + t.wins + ' Win' + (t.wins !== 1 ? 's' : '') + '</span>' +
           '<span class="pill pill-bucks">\uD83D\uDCB0 ' + t.cash + ' GNerd Bucks</span>' +
         '</div>' +
-        (bonus ? '<div class="lb-season-bonus">\uD83C\uDFC6 ' + bonus + ' GB Season Bonus</div>' : '') +
+        (bonus ? '<div class="lb-season-bonus">\uD83D\uDCB0 ' + bonus + ' GB Season Bonus</div>' : '') +
       '</div>' +
       '<div class="lb-pts">' +
         '<div class="lb-pts-num">' + t.points + '</div>' +
