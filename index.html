@@ -74,7 +74,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .card-header h3{font-size:13px;font-weight:600;text-transform:uppercase;letter-spacing:.5px;color:var(--text-muted)}
 .card-header .badge{font-size:12px;font-weight:500;background:var(--the-green-pale);color:var(--fairway);padding:2px 8px;border-radius:20px}
 
-/* === PILL BADGES (Wins + GNerd Bucks) === */
+/* === PILL BADGES (Wins + Birdies) === */
 .pill{display:inline-flex;align-items:center;gap:2px;font-size:10px;font-weight:600;padding:2px 7px;border-radius:20px;white-space:nowrap}
 .pill-wins{background:var(--wins-bg);color:var(--wins-text)}
 .pill-bucks{background:var(--bucks-bg);color:var(--bucks-text)}
@@ -148,7 +148,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .team-chip:active{transform:scale(.96)}
 .roster-panel{display:none}
 .roster-panel.active{display:block}
-.roster-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.roster-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
 .roster-stat{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;text-align:center}
 .roster-stat .val{font-size:22px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough)}
 .roster-stat .label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
@@ -263,7 +263,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
   <div class="latest-result" id="latest-banner"></div>
   <div class="page-title">Season Standings</div>
   <div class="prize-pool" id="prize-pool">
-    <div class="prize-box"><div class="amount" id="pp-total">1,800</div><div class="desc">Total GNerd Bucks</div></div>
+    <div class="prize-box"><div class="amount" id="pp-total">1,800</div><div class="desc">Total Birdies Available</div></div>
     <div class="prize-box"><div class="amount" id="pp-events">—/37</div><div class="desc">Events Done</div></div>
   </div>
   <div class="card">
@@ -351,6 +351,7 @@ const OWNER_MAP = {
 };
 
 const MAJOR_NAMES = ['masters','u.s. open','pga championship','the open championship'];
+const SEASON_BONUS = {1: 500, 2: 300, 3: 100};
 
 // =============================================
 // ACTIVE DATA (replaced by live fetch or fallback)
@@ -437,7 +438,7 @@ function parseLeaderboard(arr) {
     team:     headers.indexOf('team'),
     points:   headers.indexOf('points'),
     wins:     headers.indexOf('wins'),
-    cash:     headers.findIndex(h => h.includes('weekly') || h.includes('gnerd bucks') || h.includes('cash') || h.includes('winnings') || h.includes('gb won')),
+    cash:     headers.findIndex(h => h.includes('weekly') || h.includes('gnerd bucks') || h.includes('birdies') || h.includes('cash') || h.includes('winnings') || h.includes('gb won')),
     topPayout:headers.findIndex(h => h.includes('top team') || h.includes('top payout') || h.includes('season bonus')),
     total:    headers.indexOf('total'),
   };
@@ -596,7 +597,7 @@ function parseScoreboard(arr, draftMap, leaderboard) {
     if (typeof prize === 'string') prize = prize.replace(/[$]/g, '').trim();
     if (typeof prize === 'string' && /^\d+$/.test(prize)) prize = parseInt(prize);
 
-    // Determine weekly winner — team with a 5-point (1st place) scorer wins GNerd Bucks
+    // Determine weekly winner — team with a 5-point (1st place) scorer wins Birdies
     let winner = null;
     if (completed && typeof prize === 'number') {
       const fivePointScorer = scorers.find(s => s.p === 5);
@@ -944,8 +945,8 @@ function renderLeaderboard() {
   if (lastCompleted) {
     const banner = document.getElementById('latest-banner');
     const winnerText = lastCompleted.winner
-      ? 'GNerd Bucks: ' + lastCompleted.winner + ' \u00B7 ' + (lastCompleted.scorers[0]?.g || '') + ' (' + lastCompleted.scorers[0]?.p + 'pts)'
-      : 'No GNerd Bucks this week';
+      ? 'Winner: ' + lastCompleted.winner + ' \u00B7 ' + (lastCompleted.scorers[0]?.g || '') + ' (' + lastCompleted.scorers[0]?.p + 'pts)'
+      : 'No winner this week';
     banner.innerHTML =
       '<div class="label">Latest Result</div>' +
       '<div class="tourney">' + lastCompleted.name + '</div>' +
@@ -959,7 +960,6 @@ function renderLeaderboard() {
   // Team count
   document.getElementById('team-count-badge').textContent = LEADERBOARD.length + ' Teams';
 
-  var SEASON_BONUS = {1: 500, 2: 300, 3: 100};
   const list = document.getElementById('leaderboard-list');
   list.innerHTML = LEADERBOARD.map(function(t) {
     var bonus = SEASON_BONUS[t.rank];
@@ -970,9 +970,9 @@ function renderLeaderboard() {
         '<div class="lb-meta">' +
           getMovement(t.rank, t.lastWeek) +
           '<span class="pill pill-wins">\uD83C\uDFC6 ' + t.wins + ' Win' + (t.wins !== 1 ? 's' : '') + '</span>' +
-          '<span class="pill pill-bucks">\uD83D\uDCB0 ' + t.cash + ' GNerd Bucks</span>' +
+          '<span class="pill pill-bucks">\uD83D\uDCB0 ' + t.cash + ' Birdies</span>' +
+          (bonus ? '<span class="pill pill-bucks">\uD83D\uDCB0 +' + bonus + ' Season</span>' : '') +
         '</div>' +
-        (bonus ? '<div class="lb-season-bonus">\uD83D\uDCB0 ' + bonus + ' GB Season Bonus</div>' : '') +
       '</div>' +
       '<div class="lb-pts">' +
         '<div class="lb-pts-num">' + t.points + '</div>' +
@@ -991,7 +991,7 @@ function renderResults() {
   list.innerHTML = completed.map(function(t, i) {
     var prizeClass = typeof t.prize === 'number' ? (t.prize >= 50 ? 'major' : 'cash')
       : (t.prize === 'POINTS ONLY' ? 'pts-only' : 'no-winner');
-    var prizeText = typeof t.prize === 'number' ? t.prize + ' GB' : t.prize;
+    var prizeText = typeof t.prize === 'number' ? t.prize + ' Birdies' : t.prize;
     return '<div class="card tourney-card ' + (i === 0 ? 'open' : '') + '" onclick="toggleTourney(this)">' +
       '<div class="tourney-header">' +
         '<div>' +
@@ -1006,7 +1006,7 @@ function renderResults() {
           return '<div class="scorer-row' + (isWinner ? ' scorer-winner' : '') + '">' +
             '<div class="scorer-pts p' + s.p + '">' + s.p + '</div>' +
             '<div class="scorer-name">' + s.g + '</div>' +
-            (isWinner ? '<div class="scorer-gb-badge">\u2B50 GNerd Bucks \u00B7 ' + s.t + '</div>' : '<div class="scorer-team">' + s.t + '</div>') +
+            (isWinner ? '<div class="scorer-gb-badge">\u2B50 Winner \u00B7 ' + s.t + '</div>' : '<div class="scorer-team">' + s.t + '</div>') +
           '</div>';
         }).join('') +
       '</div>' +
@@ -1016,7 +1016,7 @@ function renderResults() {
   upcoming.map(function(t) {
     var prizeClass = typeof t.prize === 'number' ? (t.prize >= 50 ? 'major' : 'cash')
       : (t.prize === 'POINTS ONLY' ? 'pts-only' : 'no-winner');
-    var prizeText = typeof t.prize === 'number' ? t.prize + ' GB' : t.prize;
+    var prizeText = typeof t.prize === 'number' ? t.prize + ' Birdies' : t.prize;
     var isNext = t === nextUp;
     return '<div class="card tourney-card upcoming">' +
       '<div class="tourney-header">' +
@@ -1056,9 +1056,10 @@ function renderRosters() {
     var sortedGolfers = [...team.golfers].sort((a, b) => b.total - a.total);
     return '<div class="roster-panel ' + (i === 0 ? 'active' : '') + '" id="roster-' + name.replace(/\s/g, '-') + '">' +
       '<div class="roster-stats">' +
+        '<div class="roster-stat"><div class="val">#' + (lb?.rank || '—') + '</div><div class="label">Rank</div></div>' +
         '<div class="roster-stat"><div class="val">' + team.totalPoints + '</div><div class="label">Points</div></div>' +
         '<div class="roster-stat"><div class="val">' + team.wins + '</div><div class="label">Wins</div></div>' +
-        '<div class="roster-stat"><div class="val">#' + (lb?.rank || '—') + '</div><div class="label">Rank</div></div>' +
+        '<div class="roster-stat"><div class="val">' + ((lb?.cash || 0) + (SEASON_BONUS[lb?.rank] || 0)) + '</div><div class="label">Total Birdies</div></div>' +
       '</div>' +
       '<div class="card">' +
         '<div class="card-header"><h3>' + (OWNER_MAP[name] || name) + '</h3><span class="badge">Draft Position: ' + draftPos + '</span></div>' +
@@ -1132,7 +1133,7 @@ function openTeamModal(teamName) {
     '<div class="roster-stats">' +
       '<div class="roster-stat"><div class="val">' + team.totalPoints + '</div><div class="label">Points</div></div>' +
       '<div class="roster-stat"><div class="val">' + team.wins + '</div><div class="label">Wins</div></div>' +
-      '<div class="roster-stat"><div class="val">' + lb.cash + '</div><div class="label">GNerd Bucks</div></div>' +
+      '<div class="roster-stat"><div class="val">' + lb.cash + '</div><div class="label">Birdies</div></div>' +
     '</div>' +
     '<div class="card">' +
       '<div class="card-header"><h3>Roster</h3><span class="badge">Rank #' + lb.rank + '</span></div>' +
