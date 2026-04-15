@@ -104,7 +104,7 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 
 /* Prize Pool */
 .prize-pool{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.lb-season-bonus{font-size:10px;font-weight:600;color:var(--bucks-text);background:var(--gold-tint);padding:1px 6px;border-radius:10px;margin-left:auto;white-space:nowrap}
+.lb-season-bonus{font-size:10px;font-weight:600;color:var(--bucks-text);background:var(--gold-tint);padding:2px 8px;border-radius:10px;margin-top:3px;display:inline-block}
 .prize-box{background:var(--card-bg);border:1px solid var(--card-border);border-radius:var(--radius);padding:10px;text-align:center}
 .prize-box .amount{font-size:18px;font-weight:500;font-variant-numeric:tabular-nums;color:var(--deep-rough)}
 .prize-box .desc{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.5px;margin-top:2px}
@@ -116,8 +116,8 @@ body{padding-bottom:calc(var(--nav-h) + env(safe-area-inset-bottom,20px) + 12px)
 .tourney-name{font-weight:600;font-size:14px;line-height:1.3}
 .tourney-date{font-size:12px;color:var(--text-muted);margin-top:2px}
 .tourney-prize{flex-shrink:0;margin-left:10px;font-size:12px;font-weight:600;font-variant-numeric:tabular-nums;padding:3px 8px;border-radius:20px}
-.tourney-prize.cash{background:var(--the-green-pale);color:var(--fairway)}
-.tourney-prize.major{background:var(--gold-tint);color:var(--bucks-text)}
+.tourney-prize.cash{background:var(--gold-tint);color:var(--bucks-text)}
+.tourney-prize.major{background:var(--gnerd-gold);color:var(--bucks-text)}
 .tourney-prize.pts-only{background:var(--fog-dark);color:var(--text-muted)}
 .tourney-prize.no-winner{background:#fef0ef;color:var(--danger)}
 .tourney-body{display:none;padding:0 14px 12px}
@@ -432,7 +432,7 @@ function parseLeaderboard(arr) {
   const headers = arr[hdr].map(c => (c || '').toLowerCase().trim());
   console.log('Leaderboard headers:', headers);
   const col = {
-    lastWeek: headers.indexOf('last week'),
+    lastWeek: headers.findIndex(h => h === 'last week' || h === 'lw' || h === 'prev' || h === 'previous' || h.includes('last wk') || h.includes('prior')),
     rank:     headers.indexOf('rank'),
     team:     headers.indexOf('team'),
     points:   headers.indexOf('points'),
@@ -441,6 +441,7 @@ function parseLeaderboard(arr) {
     topPayout:headers.findIndex(h => h.includes('top team') || h.includes('top payout') || h.includes('season bonus')),
     total:    headers.indexOf('total'),
   };
+  console.log('Leaderboard column indices:', col);
 
   function cleanNum(val) { return parseInt(String(val || '').replace(/[$,]/g, '')) || 0; }
 
@@ -930,6 +931,7 @@ const FALLBACK_TOURNAMENTS = [
 // =============================================
 
 function getMovement(rank, lastWeek) {
+  if (!lastWeek || lastWeek <= 0) return '';
   const diff = lastWeek - rank;
   if (diff > 0) return '<span class="lb-movement up">\u25B2' + diff + '</span>';
   if (diff < 0) return '<span class="lb-movement down">\u25BC' + Math.abs(diff) + '</span>';
@@ -969,8 +971,8 @@ function renderLeaderboard() {
           getMovement(t.rank, t.lastWeek) +
           '<span class="pill pill-wins">\uD83C\uDFC6 ' + t.wins + ' Win' + (t.wins !== 1 ? 's' : '') + '</span>' +
           '<span class="pill pill-bucks">\uD83D\uDCB0 ' + t.cash + ' GNerd Bucks</span>' +
-          (bonus ? '<span class="lb-season-bonus">\uD83C\uDFC6 ' + bonus + ' GB Season Bonus</span>' : '') +
         '</div>' +
+        (bonus ? '<div class="lb-season-bonus">\uD83C\uDFC6 ' + bonus + ' GB Season Bonus</div>' : '') +
       '</div>' +
       '<div class="lb-pts">' +
         '<div class="lb-pts-num">' + t.points + '</div>' +
